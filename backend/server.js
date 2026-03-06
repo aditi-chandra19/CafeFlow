@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
+const TableBooking = require("./models/TableBooking");
 const { auth, adminOnly } = require("./middleware/auth");
 
 const User = require("./models/User");
@@ -156,7 +156,28 @@ app.post("/place-order", auth, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+app.post("/book-table", async (req, res) => {
+  try {
+    const { name, phone, guests, date, time, restaurantId } = req.body;
 
+    const booking = new TableBooking({
+      name,
+      phone,
+      guests,
+      date,
+      time,
+      restaurantId
+    });
+
+    await booking.save();
+
+    res.json({ message: "Table booked successfully" });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Booking failed" });
+  }
+});
 app.get("/my-orders", auth, async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.user.id })

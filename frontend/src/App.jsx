@@ -1,42 +1,39 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Checkout from "./pages/Checkout";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Menu from "./pages/Menu"; // restaurant list page
-import RestaurantMenu from "./pages/RestaurantMenu"; // single restaurant menu
+import Menu from "./pages/Menu";
+import RestaurantMenu from "./pages/RestaurantMenu";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import Payment from "./pages/Payment";
+import OrderSuccess from "./pages/OrderSuccess";
 import OrderHistory from "./pages/OrderHistory";
 import Dashboard from "./pages/Dashboard";
-import Payment from "./pages/Payment";
+import BookTable from "./pages/BookTable";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
+        {/* AUTH */}
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Restaurant List */}
+        {/* RESTAURANT LIST */}
         <Route
-          path="/restaurants"
+          path="/menu"
           element={
             <ProtectedRoute>
               <Menu />
             </ProtectedRoute>
           }
         />
-         <Route
-  path="/checkout"
-  element={
-    <ProtectedRoute>
-      <Checkout />
-    </ProtectedRoute>
-  }
-/>
-        {/* Single Restaurant Menu */}
+
+        {/* RESTAURANT MENU */}
         <Route
           path="/restaurant/:id"
           element={
@@ -46,6 +43,7 @@ function App() {
           }
         />
 
+        {/* CART */}
         <Route
           path="/cart"
           element={
@@ -55,6 +53,17 @@ function App() {
           }
         />
 
+        {/* CHECKOUT */}
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* PAYMENT */}
         <Route
           path="/payment"
           element={
@@ -64,6 +73,17 @@ function App() {
           }
         />
 
+        {/* SUCCESS */}
+        <Route
+          path="/success"
+          element={
+            <ProtectedRoute>
+              <OrderSuccess />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ORDERS */}
         <Route
           path="/orders"
           element={
@@ -73,6 +93,17 @@ function App() {
           }
         />
 
+        {/* BOOK TABLE */}
+        <Route
+          path="/book-table"
+          element={
+            <ProtectedRoute>
+              <BookTable />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ADMIN */}
         <Route
           path="/dashboard"
           element={

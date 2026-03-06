@@ -58,7 +58,7 @@ function Payment() {
       localStorage.removeItem("cart");
       localStorage.removeItem("deliveryDetails");
 
-      navigate("/orders");
+      navigate("/success");
 
     } catch (error) {
       console.log(error);

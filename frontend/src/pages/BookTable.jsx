@@ -13,6 +13,12 @@ function BookTable() {
 
   const handleBooking = async () => {
 
+    // validation check
+    if (!name.trim() || !phone.trim() || !date || !time || guests < 1) {
+      alert("Please fill all booking details ❗");
+      return;
+    }
+
     const res = await fetch("http://localhost:5000/book-table",{
       method:"POST",
       headers:{
@@ -30,78 +36,115 @@ function BookTable() {
     const data = await res.json();
 
     alert(data.message);
-    setTimeout(()=> {navigate("/menu");
+
+    setTimeout(()=>{
+      navigate("/menu");
     },500);
-    
+
   };
 
   return (
-    <div style={{padding:"40px"}}>
-
-      {/* BACK BUTTON */}
-      <button
-        onClick={() => navigate("/menu")}
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "linear-gradient(135deg,#f8fafc,#e2e8f0)"
+      }}
+    >
+      <div
         style={{
-          marginBottom:"20px",
-          padding:"8px 16px",
-          background:"#444",
-          color:"white",
-          border:"none",
-          borderRadius:"8px",
-          cursor:"pointer"
+          width: "90%",
+          maxWidth: "580px",  
+          background: "white",
+          padding: "30px",
+          borderRadius: "16px",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
         }}
       >
-        ← Back
-      </button>
 
-      <h1>Book a Table 🍽</h1>
+        <button
+          onClick={() => navigate("/menu")}
+          style={{
+            marginBottom:"20px",
+            padding:"8px 16px",
+            background:"#444",
+            color:"white",
+            border:"none",
+            borderRadius:"8px",
+            cursor:"pointer"
+          }}
+        >
+          ← Back
+        </button>
 
-      <input
-        placeholder="Your Name"
-        value={name}
-        onChange={(e)=>setName(e.target.value)}
-      />
+        <h1 style={{marginBottom:"20px"}}>Book a Table 🍽</h1>
 
-      <br/><br/>
+        <input
+          placeholder="Your Name"
+          value={name}
+          onChange={(e)=>setName(e.target.value)}
+          style={inputStyle}
+        />
 
-      <input
-        placeholder="Phone"
-        value={phone}
-        onChange={(e)=>setPhone(e.target.value)}
-      />
+        <input
+          placeholder="Phone"
+          value={phone}
+          onChange={(e)=>setPhone(e.target.value)}
+          style={inputStyle}
+        />
 
-      <br/><br/>
+        <input
+          type="number"
+          value={guests}
+          onChange={(e)=>setGuests(Number(e.target.value))}
+          style={inputStyle}
+        />
 
-      <input
-        type="number"
-        value={guests}
-        onChange={(e)=>setGuests(e.target.value)}
-      />
+        <input
+          type="date"
+          value={date}
+          onChange={(e)=>setDate(e.target.value)}
+          style={inputStyle}
+        />
 
-      <br/><br/>
+        <input
+          type="time"
+          value={time}
+          onChange={(e)=>setTime(e.target.value)}
+          style={inputStyle}
+        />
 
-      <input
-        type="date"
-        value={date}
-        onChange={(e)=>setDate(e.target.value)}
-      />
+        <button
+          onClick={handleBooking}
+          style={{
+            width:"100%",
+            padding:"12px",
+            marginTop:"10px",
+            background:"#16a34a",
+            color:"white",
+            border:"none",
+            borderRadius:"10px",
+            fontSize:"16px",
+            cursor:"pointer"
+          }}
+        >
+          Book Table
+        </button>
 
-      <br/><br/>
-
-      <input
-        type="time"
-        value={time}
-        onChange={(e)=>setTime(e.target.value)}
-      />
-
-      <br/><br/>
-
-      <button onClick={handleBooking}>
-        Book Table
-      </button>
-
+      </div>
     </div>
   );
 }
+
+const inputStyle = {
+  width: "100%",
+  padding: "12px",
+  marginBottom: "12px",
+  borderRadius: "8px",
+  border: "1px solid #ccc",
+  fontSize: "15px"
+};
 
 export default BookTable;

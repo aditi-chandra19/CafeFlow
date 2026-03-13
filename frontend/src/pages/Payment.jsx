@@ -5,7 +5,7 @@ function Payment() {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [delivery, setDelivery] = useState(null);
-
+  const [discount,setDiscount] = useState(0);
   // Payment states
   const [paymentMethod, setPaymentMethod] = useState(null);
 
@@ -23,17 +23,31 @@ function Payment() {
       JSON.parse(localStorage.getItem("cart")) || [];
     setCart(savedCart);
 
+  
     const details =
       JSON.parse(localStorage.getItem("deliveryDetails"));
     setDelivery(details);
+    const savedDiscount = localStorage.getItem("discount");
+if(savedDiscount){
+  setDiscount(Number(savedDiscount));
+}
   }, []);
 
-  const totalPrice = cart.reduce(
-    (total, item) => total + item.price,
-    0
-  );
+  const subtotal = cart.reduce(
+  (total, item) => total + item.price * (item.qty || 1),
+  0
+);
+
+const totalPrice = subtotal - subtotal * discount;
 
   const placeOrder = async () => {
+
+    if (!delivery) {
+      alert("Delivery address missing ❗");
+      navigate("/delivery");
+      return;
+    }
+
     const token = localStorage.getItem("token");
 
     try {
@@ -47,7 +61,8 @@ function Payment() {
           },
           body: JSON.stringify({
             items: cart,
-            total: totalPrice
+            total: totalPrice,
+            delivery
           })
         }
       );
@@ -57,7 +72,7 @@ function Payment() {
 
       localStorage.removeItem("cart");
       localStorage.removeItem("deliveryDetails");
-
+      localStorage.removeItem("discount");
       navigate("/success");
 
     } catch (error) {
@@ -97,35 +112,86 @@ function Payment() {
         <h3>Order Summary</h3>
 
         {cart.map((item, index) => (
-          <div
-            key={index}
-            style={{
-              padding: "12px",
-              marginBottom: "10px",
-              background: "#f9fafb",
-              borderRadius: "10px"
-            }}
-          >
-            {item.name} - ₹ {item.price}
-          </div>
-        ))}
+  <div
+    key={index}
+    style={{
+      padding: "15px",
+      marginBottom: "15px",
+      background: "#f8fafc",
+      borderRadius: "12px",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.05)"
+    }}
+  >
+    <div>
+      <strong style={{fontSize:"17px"}}>{item.name}</strong>
+      <p style={{color:"#555"}}>Qty: {item.qty || 1}</p>
+    </div>
 
-        <h2 style={{ marginTop: "20px" }}>
-          Total: ₹ {totalPrice}
-        </h2>
+    <div style={{fontWeight:"bold"}}>
+      ₹ {item.price * (item.qty || 1)}
+    </div>
+  </div>
+))}
+
+        <div
+  style={{
+    background:"#f8fafc",
+    padding:"20px",
+    borderRadius:"12px",
+    marginTop:"20px",
+    boxShadow:"0 4px 10px rgba(0,0,0,0.05)"
+  }}
+>
+
+<p>Subtotal: ₹ {subtotal}</p>
+
+{discount > 0 && (
+  <p style={{color:"green"}}>
+    Discount: -{discount * 100}%
+  </p>
+)}
+
+<h2 style={{marginTop:"10px"}}>
+  Total Payable: ₹ {totalPrice.toFixed(2)}
+</h2>
+
+</div>
 
         <hr style={{ margin: "20px 0" }} />
 
-        <h3>Delivery Details</h3>
+        <h3 style={{marginTop:"30px"}}>Delivery Details</h3>
 
-        {delivery && (
-          <div style={{ marginBottom: "20px" }}>
-            <p><strong>{delivery.name}</strong></p>
-            <p>{delivery.phone}</p>
-            <p>{delivery.address}</p>
-            <p>{delivery.city} - {delivery.pincode}</p>
-          </div>
-        )}
+{delivery ? (
+
+  <div
+    style={{
+      background:"#f8fafc",
+      padding:"18px",
+      borderRadius:"12px",
+      marginBottom:"20px",
+      boxShadow:"0 4px 10px rgba(0,0,0,0.05)"
+    }}
+  >
+
+    <h3 style={{marginBottom:"10px"}}>Delivery Address 📍</h3>
+
+    <p><strong>{delivery.name}</strong></p>
+    <p>{delivery.phone}</p>
+    <p>{delivery.address}</p>
+    <p>{delivery.city} - {delivery.pincode}</p>
+
+  </div>
+
+) : (
+
+  <p style={{color:"red"}}>
+    No delivery address found
+  </p>
+
+)}
 
         <hr style={{ margin: "20px 0" }} />
 
@@ -249,13 +315,16 @@ const backBtn = {
 
 const btnStyle = {
   display: "block",
-  margin: "10px 0",
-  padding: "10px 20px",
-  background: "black",
+  width:"100%",
+  margin: "12px 0",
+  padding: "12px",
+  background: "rgba(26, 26, 147, 0.91)",
   color: "white",
   border: "none",
-  borderRadius: "8px",
-  cursor: "pointer"
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontSize:"15px",
+  fontWeight:"600"
 };
 
 const inputStyle = {

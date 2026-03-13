@@ -9,9 +9,21 @@ function Cart() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const savedCart =
-      JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(savedCart);
+    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+
+const merged = [];
+
+savedCart.forEach(item => {
+  const existing = merged.find(i => i._id === item._id);
+
+  if (existing) {
+    existing.qty += item.qty || 1;
+  } else {
+    merged.push({ ...item, qty: item.qty || 1 });
+  }
+});
+
+setCart(merged);
   }, []);
 
   // quantity increase
@@ -28,6 +40,8 @@ function Cart() {
 
     if ((updatedCart[index].qty || 1) > 1) {
       updatedCart[index].qty -= 1;
+    }else{
+      updatedCart.splice(index,1);
     }
 
     setCart(updatedCart);
@@ -42,11 +56,18 @@ function Cart() {
   const applyCoupon = () => {
     if (coupon === "SAVE10") {
       setDiscount(0.1);
+      localStorage.setItem("discount", 0.1);
       alert("10% discount applied 🎉");
-    } else if (coupon === "CAFE20") {
+    } else if (coupon === "SAVE20") {
       setDiscount(0.2);
+      localStorage.setItem("discount", 0.2);
       alert("20% discount applied 🎉");
-    } else {
+    }else if(coupon == "LUCKYYOU"){
+      setDiscount(0.5);
+      localStorage.setItem("discount", 0.5);
+      alert("50% discount applied 🎉 ");
+    }
+    else {
       alert("Invalid coupon");
     }
   };
@@ -163,7 +184,10 @@ function Cart() {
             </div>
 
             <button
-              onClick={() => navigate("/payment")}
+              onClick={() => {
+  localStorage.setItem("finalPrice", finalPrice);
+  navigate("/delivery");
+}}
               style={{
                 marginTop: "20px",
                 padding: "10px 20px",

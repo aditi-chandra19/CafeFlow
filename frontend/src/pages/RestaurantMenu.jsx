@@ -8,6 +8,8 @@ function RestaurantMenu() {
 
   const [items,setItems] = useState([]);
   const [restaurant,setRestaurant] = useState(null);
+  const [search,setSearch] = useState("");
+  const cartCount = JSON.parse(localStorage.getItem("cart") || "[]").length;
 
   useEffect(()=>{
 
@@ -26,17 +28,22 @@ function RestaurantMenu() {
   },[id]);
 
 
-  const addToCart = (item)=>{
+  const addToCart = (item) => {
 
-    const existing = JSON.parse(localStorage.getItem("cart")) || [];
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    localStorage.setItem(
-      "cart",
-      JSON.stringify([...existing,item])
-    );
+  const existingItem = cart.find(i => i._id === item._id);
 
-    alert(`${item.name} added to cart 🛒`);
-  };
+  if (existingItem) {
+    existingItem.qty = (existingItem.qty || 1) + 1;
+  } else {
+    cart.push({ ...item, qty: 1 });
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  alert(`${item.name} added to cart 🛒`);
+};
 
 
   return(
@@ -65,19 +72,29 @@ function RestaurantMenu() {
 
         <div style={{marginBottom:"30px"}}>
 
-          <h1 style={{fontSize:"32px"}}>
-            {restaurant.name}
-          </h1>
+  <img
+    src={restaurant.image}
+    alt={restaurant.name}
+    style={{
+      width:"100%",
+      height:"250px",
+      objectFit:"cover",
+      borderRadius:"16px",
+      marginBottom:"20px"
+    }}
+  />
 
-          <div style={{display:"flex",gap:"20px",color:"#555"}}>
+  <h1 style={{fontSize:"36px",fontWeight:"700",}}>
+    {restaurant.name}
+  </h1>
 
-            <span>⭐ {restaurant.rating}</span>
+  <div style={{display:"flex",gap:"20px",color:"#555"}}>
 
-            <span>{restaurant.deliveryTime}</span>
+    <span>⭐ {restaurant.rating}</span>
+    <span>{restaurant.deliveryTime}</span>
+    <span>{restaurant.priceRange}</span>
 
-            <span>{restaurant.priceRange}</span>
-
-          </div>
+  </div>
 
           <button
             onClick={()=>navigate("/book-table")}
@@ -102,14 +119,28 @@ function RestaurantMenu() {
         <p>Loading restaurant...</p>
 
       )}
-
+      {/* SEARCH BAR */}
+<input
+  type="text"
+  placeholder="🔍 Search dishes..."
+  value={search}
+  onChange={(e)=>setSearch(e.target.value)}
+  style={{
+    width:"100%",
+    padding:"12px",
+    borderRadius:"10px",
+    border:"1px solid #ccc",
+    marginBottom:"25px",
+    fontSize:"16px"
+  }}
+/>
 
 
       {/* MENU GRID */}
       <div
         style={{
           display:"grid",
-          gridTemplateColumns:"repeat(auto-fill,minmax(250px,1fr))",
+          gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",
           gap:"25px"
         }}
       >
@@ -118,8 +149,11 @@ function RestaurantMenu() {
           <p>No menu items found.</p>
         )}
 
-
-        {items.map(item => (
+        {items
+  .filter(item =>
+    item.name.toLowerCase().includes(search.toLowerCase())
+  )
+  .map(item => (
 
           <div
             key={item._id}
@@ -127,7 +161,22 @@ function RestaurantMenu() {
               background:"#fff",
               borderRadius:"16px",
               boxShadow:"0 10px 25px rgba(0,0,0,0.08)",
-              overflow:"hidden"
+              overflow:"hidden",
+              transition:"transform 0.2s ease, box-shadow 0.2s ease",
+              cursor:"pointer",
+              display:"flex",
+              flexDirection:"column",
+              height:"100%"
+            }}
+
+            onMouseEnter={(e)=>{
+              e.currentTarget.style.transform="translateY(-6px)";
+              e.currentTarget.style.boxShadow="0 15px 35px rgba(0,0,0,0.15)";
+            }}
+
+            onMouseLeave={(e)=>{
+              e.currentTarget.style.transform="translateY(0)";
+              e.currentTarget.style.boxShadow="0 10px 25px rgba(0,0,0,0.08)";
             }}
           >
 
@@ -141,15 +190,35 @@ function RestaurantMenu() {
               }}
             />
 
-            <div style={{padding:"15px"}}>
+            <div
+              style={{
+                padding:"15px",
+                display:"flex",
+                flexDirection:"column",
+                flexGrow:1
+              }}
+            >
 
-              <h3>{item.name}</h3>
+              <h3
+                style={{
+                  fontSize:"22px",
+                  fontWeight:"600",
+                  marginBottom:"5px"
+                }}
+              >
+                {item.name}
+              </h3>
 
               <p style={{fontSize:"14px",color:"#666"}}>
                 ⭐ {item.rating}
               </p>
 
-              <p style={{fontWeight:"bold"}}>
+              <p
+                style={{
+                  fontWeight:"bold",
+                  fontSize:"18px"
+                }}
+              >
                 ₹ {item.price}
               </p>
 
@@ -189,15 +258,25 @@ function RestaurantMenu() {
                 <button
                   onClick={()=>addToCart(item)}
                   style={{
-                    marginTop:"10px",
+                    marginTop:"auto",
                     width:"100%",
-                    padding:"10px",
-                    borderRadius:"10px",
+                    padding:"14px",
+                    borderRadius:"12px",
                     border:"none",
                     background:"linear-gradient(45deg,#10b981,#3b82f6)",
                     color:"white",
                     cursor:"pointer",
-                    fontWeight:"bold"
+                    fontWeight:"bold",
+                    fontSize:"16px",
+                    letterSpacing:"0.4px",
+                    boxShadow:"0 6px 15px rgba(0,0,0,0.15)",
+                    transition:"transform 0.15s ease"
+                  }}
+                  onMouseEnter={(e)=>{
+                    e.currentTarget.style.transform="scale(1.03)";
+                  }}
+                  onMouseLeave={(e)=>{
+                    e.currentTarget.style.transform="scale(1)";
                   }}
                 >
                   Add to Cart 🛒
@@ -213,10 +292,9 @@ function RestaurantMenu() {
       </div>
 
 
-
       {/* FLOATING CART BUTTON */}
 
-      {JSON.parse(localStorage.getItem("cart") || "[]").length > 0 && (
+      {cartCount > 0 && (
 
         <button
           onClick={()=>navigate("/cart")}
@@ -224,17 +302,18 @@ function RestaurantMenu() {
             position:"fixed",
             bottom:"30px",
             right:"30px",
-            padding:"15px 20px",
+            padding:"16px 24px",
             borderRadius:"50px",
             border:"none",
             background:"#10b981",
             color:"white",
             fontWeight:"bold",
+            fontSize:"16px",
             boxShadow:"0 10px 25px rgba(0,0,0,0.2)",
             cursor:"pointer"
           }}
         >
-          Go To Cart 🛒
+          Go To Cart 🛒 ({cartCount})
         </button>
 
       )}

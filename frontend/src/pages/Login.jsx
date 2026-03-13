@@ -24,7 +24,7 @@ function Login() {
       if (data.role === "admin") {
         navigate("/dashboard");
       } else {
-        navigate("/restaurants");
+        navigate("/menu");
       }
     } else {
       alert(data.message || "Login failed");

@@ -27,7 +27,7 @@ function App() {
   useEffect(() => {
 
   if (darkMode) {
-    document.body.style.background = "rgba(107, 108, 109, 0.29)";
+    document.body.style.background = "hsla(0, 2%, 20%, 0.45)";
     localStorage.setItem("theme", "dark");
   } else {
     document.body.style.background = "#f8fafc";

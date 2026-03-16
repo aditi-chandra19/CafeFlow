@@ -9,6 +9,10 @@ function RestaurantMenu() {
   const [items,setItems] = useState([]);
   const [restaurant,setRestaurant] = useState(null);
   const [search,setSearch] = useState("");
+  // category selected from dropdown
+  const [selectedCategory,setSelectedCategory] = useState("All");
+  // collect unique categories from menu
+  const categories = ["All", ...new Set(items.map(item => item.category))];
   const cartCount = JSON.parse(localStorage.getItem("cart") || "[]").length;
 
   useEffect(()=>{
@@ -27,7 +31,7 @@ function RestaurantMenu() {
 
   },[id]);
 
-
+// add to cart styff
   const addToCart = (item) => {
 
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -135,7 +139,28 @@ function RestaurantMenu() {
   }}
 />
 
+<div style={{marginBottom:"20px"}}>
 
+<select
+  value={selectedCategory}
+  onChange={(e)=>setSelectedCategory(e.target.value)}
+  style={{
+    padding:"8px 12px",
+    borderRadius:"6px",
+    border:"1px solid #ccc",
+    fontSize:"14px"
+  }}
+>
+
+{categories.map(cat => (
+  <option key={cat} value={cat}>
+    {cat}
+  </option>
+))}
+
+</select>
+
+</div>
       {/* MENU GRID */}
       <div
         style={{
@@ -150,10 +175,10 @@ function RestaurantMenu() {
         )}
 
         {items
-  .filter(item =>
-    item.name.toLowerCase().includes(search.toLowerCase())
-  )
-  .map(item => (
+.filter(item =>
+  selectedCategory === "All" || item.category === selectedCategory
+)
+.map(item => (
 
           <div
             key={item._id}
@@ -260,13 +285,13 @@ function RestaurantMenu() {
                   style={{
                     marginTop:"auto",
                     width:"100%",
-                    padding:"14px",
-                    borderRadius:"12px",
+                    padding:"12px",
+                    borderRadius:"6px",
                     border:"none",
                     background:"linear-gradient(45deg,#10b981,#3b82f6)",
                     color:"white",
                     cursor:"pointer",
-                    fontWeight:"bold",
+                    fontWeight:"500",
                     fontSize:"16px",
                     letterSpacing:"0.4px",
                     boxShadow:"0 6px 15px rgba(0,0,0,0.15)",

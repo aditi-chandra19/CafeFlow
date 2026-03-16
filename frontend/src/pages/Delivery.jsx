@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Delivery() {
@@ -10,6 +10,20 @@ function Delivery() {
   const [address,setAddress] = useState("");
   const [city,setCity] = useState("");
   const [pincode,setPincode] = useState("");
+
+  const [savedAddress,setSavedAddress] = useState(null);
+
+  // Load saved address when page opens
+  useEffect(()=>{
+
+    const saved = JSON.parse(localStorage.getItem("deliveryDetails"));
+
+    if(saved){
+      setSavedAddress(saved);
+    }
+
+  },[]);
+
 
   const saveAddress = () => {
 
@@ -26,6 +40,7 @@ function Delivery() {
       pincode
     };
 
+    // Save address
     localStorage.setItem(
       "deliveryDetails",
       JSON.stringify(deliveryDetails)
@@ -33,6 +48,8 @@ function Delivery() {
 
     navigate("/payment");
   };
+
+
 
   return(
 
@@ -52,20 +69,73 @@ function Delivery() {
       }}>
 
         <h1>Delivery Address 📍</h1>
+
         <button
-  onClick={() => navigate("/menu")}
-  style={{
-    marginBottom: "20px",
-    padding: "8px 16px",
-    background: "#444",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer"
-  }}
->
-  ← Back 
-</button>
+          onClick={() => navigate("/menu")}
+          style={{
+            marginBottom: "20px",
+            padding: "8px 16px",
+            background: "#444",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer"
+          }}
+        >
+          ← Back
+        </button>
+
+
+        {/* SAVED ADDRESS CARD */}
+
+        {savedAddress && (
+
+        <div
+        style={{
+          background:"#f1f5f9",
+          padding:"15px",
+          borderRadius:"10px",
+          marginBottom:"20px"
+        }}
+        >
+
+        <h3 style={{marginBottom:"8px"}}>Saved Address 🏠</h3>
+
+        <p><strong>{savedAddress.name}</strong></p>
+        <p>{savedAddress.phone}</p>
+        <p>{savedAddress.address}</p>
+        <p>{savedAddress.city} - {savedAddress.pincode}</p>
+
+        <button
+        onClick={()=>{
+          setName(savedAddress.name);
+          setPhone(savedAddress.phone);
+          setAddress(savedAddress.address);
+          setCity(savedAddress.city);
+          setPincode(savedAddress.pincode);
+        }}
+
+        style={{
+          marginTop:"10px",
+          padding:"8px 14px",
+          background:"#111",
+          color:"white",
+          border:"none",
+          borderRadius:"6px",
+          cursor:"pointer"
+        }}
+        >
+        Use This Address
+        </button>
+
+        </div>
+
+        )}
+
+
+
+        {/* ADDRESS FORM */}
+
         <input
           placeholder="Full Name"
           value={name}
@@ -101,6 +171,8 @@ function Delivery() {
           style={inputStyle}
         />
 
+
+
         <button
           onClick={saveAddress}
           style={{
@@ -123,6 +195,7 @@ function Delivery() {
     </div>
   );
 }
+
 
 const inputStyle = {
   display:"block",

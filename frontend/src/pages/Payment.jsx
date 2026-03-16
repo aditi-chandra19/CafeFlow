@@ -71,8 +71,7 @@ const totalPrice = subtotal - subtotal * discount;
       alert(data.message);
 
       localStorage.removeItem("cart");
-      localStorage.removeItem("deliveryDetails");
-      localStorage.removeItem("discount");
+      
       navigate("/success");
 
     } catch (error) {

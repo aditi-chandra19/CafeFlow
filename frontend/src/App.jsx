@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
-
+import "leaflet/dist/leaflet.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";

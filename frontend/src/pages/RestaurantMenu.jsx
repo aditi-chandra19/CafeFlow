@@ -48,7 +48,13 @@ function RestaurantMenu() {
 
   alert(`${item.name} added to cart 🛒`);
 };
+// count items per category
+const categoryCount = {};
 
+items.forEach(item => {
+  const cat = item.category;
+  categoryCount[cat] = (categoryCount[cat] || 0) + 1;
+});
 
   return(
 
@@ -143,21 +149,17 @@ function RestaurantMenu() {
 
 <select
   value={selectedCategory}
-  onChange={(e)=>setSelectedCategory(e.target.value)}
-  style={{
-    padding:"8px 12px",
-    borderRadius:"6px",
-    border:"1px solid #ccc",
-    fontSize:"14px"
-  }}
+  onChange={(e) => setSelectedCategory(e.target.value)}
 >
-
-{categories.map(cat => (
-  <option key={cat} value={cat}>
-    {cat}
+  <option value="All">
+    All ({items.length})
   </option>
-))}
 
+  {[...new Set(items.map(item => item.category))].map(cat => (
+    <option key={cat} value={cat}>
+      {cat} ({categoryCount[cat]})
+    </option>
+  ))}
 </select>
 
 </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { colors } from "../theme";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -34,7 +35,9 @@ function Login() {
   return (
     <div style={container}>
       <form onSubmit={handleLogin} style={card}>
-        <h2 style={{ marginBottom: "20px" }}>☕ CafeFlow Login</h2>
+        
+        <h2 style={title}> CafeFlow ☕</h2>
+        <p style={subtitle}>Welcome Back</p>
 
         <input
           type="email"
@@ -58,61 +61,78 @@ function Login() {
           Login
         </button>
 
-        <p style={{ marginTop: "15px" }}>
+        <p style={{ marginTop: "15px", color: colors.muted }}>
           Don’t have an account?{" "}
           <button
             type="button"
             onClick={() => navigate("/register")}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#3b82f6",
-              cursor: "pointer",
-              padding: 0,
-            }}  
+            style={linkBtn}
           >
             Register
-            </button>
+          </button>
         </p>
       </form>
     </div>
   );
 }
 
+/* STYLES */
+
 const container = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   height: "100vh",
-  background: "#f4f6f9",
+  background: "#faf7f2" // parchment
 };
 
 const card = {
-  background: "white",
+  background: "#eadbc8", // almond cream
   padding: "40px",
-  borderRadius: "12px",
+  borderRadius: "20px",
   width: "350px",
-  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-  textAlign: "center",
+  boxShadow: "0 8px 20px rgba(0,0,0,0.05)",
+  textAlign: "center"
+};
+
+const title = {
+  marginBottom: "5px",
+  color: "rgb(0, 0, 0)"
+};
+
+const subtitle = {
+  marginBottom: "20px",
+  color: "#848560",
+  fontSize: "14px"
 };
 
 const input = {
   width: "100%",
-  padding: "10px",
+  padding: "12px",
   marginBottom: "15px",
   borderRadius: "8px",
-  border: "1px solid #ccc",
+  border: "1px solid #d6ccc2",
+  background: "#faf7f2"
 };
 
 const button = {
   width: "100%",
-  padding: "10px",
-  borderRadius: "8px",
+  padding: "12px",
+  borderRadius: "10px",
   border: "none",
-  background: "#3b82f6",
+  background: "#588157", // fern
   color: "white",
-  fontWeight: "bold",
+  fontWeight: "500",
+  cursor: "pointer"
+};
+
+const linkBtn = {
+  background: "none",
+  border: "none",
+  color: "#b08968", // copper
   cursor: "pointer",
+  padding: 0,
+  fontWeight: "500"
 };
 
 export default Login;

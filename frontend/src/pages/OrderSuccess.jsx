@@ -1,9 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import Toolbar from "../components/Toolbar";
 
 function OrderSuccess() {
   const navigate = useNavigate();
 
   return (
+    <>
+    <Toolbar/>
     <div
       style={{
         minHeight: "100vh",
@@ -44,6 +47,7 @@ function OrderSuccess() {
         </button>
       </div>
     </div>
+    </>
   );
 }
 

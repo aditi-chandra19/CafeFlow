@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Toolbar from "../components/Toolbar";
 
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
@@ -29,6 +30,8 @@ function OrderHistory() {
   }, []);
 
   return (
+    <>
+    <Toolbar/>
     <div style={{ padding: "40px" }}>
       <h1>My Orders 📦</h1>
 
@@ -66,6 +69,7 @@ function OrderHistory() {
         ))
       )}
     </div>
+    </>
   );
 }
 

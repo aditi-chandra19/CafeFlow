@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
+import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import Favorites from "./pages/Favorites";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Menu from "./pages/Menu";
@@ -18,45 +18,8 @@ import Delivery from "./pages/Delivery";
 
 function App() {
 
-  // 🌙 Dark mode state
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("theme") === "dark"
-  );
-
-  // apply theme
-  useEffect(() => {
-
-  if (darkMode) {
-    document.body.style.background = "hsla(0, 2%, 20%, 0.45)";
-    localStorage.setItem("theme", "dark");
-  } else {
-    document.body.style.background = "#f8fafc";
-    localStorage.setItem("theme", "light");
-  }
-
-}, [darkMode]);
-
   return (
     <BrowserRouter>
-
-      {/* DARK MODE BUTTON */}
-      <button
-        onClick={() => setDarkMode(!darkMode)}
-        style={{
-          position: "fixed",
-          top: "20px",
-          right: "20px",
-          padding: "8px 16px",
-          borderRadius: "8px",
-          border: "none",
-          cursor: "pointer",
-          background: "#111",
-          color: "white",
-          zIndex: 9999
-        }}
-      >
-        {darkMode ? "☀ Light" : "🌙 Dark"}
-      </button>
 
       <Routes>
 
@@ -65,7 +28,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* RESTAURANT LIST */}
+        {/* MENU */}
         <Route
           path="/menu"
           element={
@@ -74,10 +37,10 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route path="/profile" element={<Profile />} />
         <Route path="/delivery" element={<Delivery />} />
 
-        {/* RESTAURANT MENU */}
+        {/* RESTAURANT */}
         <Route
           path="/restaurant/:id"
           element={
@@ -86,6 +49,9 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* FAVORITES */}
+        <Route path="/favorites" element={<Favorites />} />
 
         {/* CART */}
         <Route

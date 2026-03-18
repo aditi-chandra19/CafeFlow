@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Confetti from "react-confetti";
+import { colors } from "../theme";
 
 function Success() {
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(true);
-  const [seconds, setSeconds] = useState(10); // delivery countdown
+  const [seconds, setSeconds] = useState(10);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // countdown timer
     const timer = setInterval(() => {
       setSeconds((prev) => prev - 1);
       setProgress((prev) => prev + 10);
@@ -27,7 +27,7 @@ function Success() {
 
   return (
     <div style={styles.container}>
-      {showConfetti && <Confetti numberOfPieces={250} />}
+      {showConfetti && <Confetti numberOfPieces={180} />}
 
       <div style={styles.card}>
         <div style={styles.checkmark}>✓</div>
@@ -35,14 +35,14 @@ function Success() {
         <h1 style={styles.title}>Order Confirmed 🎉</h1>
 
         <p style={styles.subtitle}>
-          Estimated Delivery Time: 20–25 mins
+          Estimated Delivery: 20–25 mins
         </p>
 
         <p style={styles.timer}>
-          Redirecting in {seconds} seconds...
+          Redirecting in {seconds}s...
         </p>
 
-        {/* Progress Bar */}
+        {/* Progress */}
         <div style={styles.progressContainer}>
           <div
             style={{
@@ -51,6 +51,13 @@ function Success() {
             }}
           />
         </div>
+
+        <button
+          onClick={() => navigate("/orders")}
+          style={styles.button}
+        >
+          View Orders
+        </button>
       </div>
     </div>
   );
@@ -62,46 +69,65 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "linear-gradient(135deg, #10b981, #3b82f6)",
+    background: "#faf7f2" // parchment
   },
+
   card: {
-    background: "white",
+    background: "#eadbc8", // almond cream
     padding: "40px",
     borderRadius: "20px",
     textAlign: "center",
-    boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
-    width: "350px"
+    boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+    width: "360px"
   },
+
   checkmark: {
-    fontSize: "70px",
-    color: "#10b981",
-    marginBottom: "15px",
-    animation: "pop 0.6s ease"
+    fontSize: "60px",
+    color: "#588157", // fern
+    marginBottom: "10px"
   },
+
   title: {
     fontSize: "24px",
-    marginBottom: "10px"
+    marginBottom: "10px",
+    color: "#2f2f2f"
   },
+
   subtitle: {
-    color: "#555",
+    color: "#848560", // dusty olive
     marginBottom: "10px"
   },
+
   timer: {
     fontSize: "14px",
     marginBottom: "15px",
-    color: "#888"
+    color: "#848560"
   },
+
   progressContainer: {
     height: "8px",
     width: "100%",
-    background: "#e5e7eb",
+    background: "#faf7f2",
     borderRadius: "10px",
-    overflow: "hidden"
+    overflow: "hidden",
+    marginBottom: "15px"
   },
+
   progressBar: {
     height: "100%",
-    background: "linear-gradient(90deg, #10b981, #3b82f6)",
+    background: "#588157", // fern
     transition: "width 1s linear"
+  },
+
+  button: {
+    marginTop: "10px",
+    padding: "10px 20px",
+    background: "#b08968", // faded copper
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "500"
   }
 };
 

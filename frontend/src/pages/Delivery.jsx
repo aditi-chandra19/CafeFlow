@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { colors } from "../theme";
+import Toolbar from "../components/Toolbar";
 function Delivery() {
 
   const navigate = useNavigate();
@@ -17,13 +18,11 @@ function Delivery() {
   const [savedAddress,setSavedAddress] = useState([]);
   const [loadingLocation,setLoadingLocation] = useState(false);
 
-  // LOAD SAVED ADDRESSES
   useEffect(()=>{
     const saved = JSON.parse(localStorage.getItem("addresses")) || [];
     setSavedAddress(saved);
   },[]);
 
-  // 🔥 GET ADDRESS FROM LAT LNG
   const getAddressFromCoords = async (lat, lng) => {
     try {
       const res = await fetch(
@@ -42,7 +41,6 @@ function Delivery() {
     }
   };
 
-  // 📍 LOCATION
   const getLocation = () => {
 
     if (!navigator.geolocation) {
@@ -53,44 +51,43 @@ function Delivery() {
     setLoadingLocation(true);
 
     navigator.geolocation.getCurrentPosition(
-  async (position) => {
+      async (position) => {
 
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
 
-    console.log("Accuracy:", position.coords.accuracy);
+        setLat(latitude);
+        setLng(longitude);
 
-    setLat(latitude);
-    setLng(longitude);
+        await getAddressFromCoords(latitude, longitude);
 
-    await getAddressFromCoords(latitude, longitude);
+        setLoadingLocation(false);
 
-    setLoadingLocation(false);
-
-  },
-  () => {
-    alert("Location permission denied ❗");
-    setLoadingLocation(false);
-  },
-  {
-    enableHighAccuracy: true,   // 🔥 IMPORTANT
-    timeout: 10000,
-    maximumAge: 0              // ❌ no cached location
-  }
-);
+      },
+      () => {
+        alert("Location permission denied ❗");
+        setLoadingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
   };
 
-  // 💾 SAVE ADDRESS
   const saveAddress = () => {
 
     if(!name || !phone || !address || !city || !pincode){
       alert("Please fill all fields ❗");
       return;
     }
+
     if(pincode.length !== 6){
-  alert("Enter valid pincode ❗");
-  return;
-}
+      alert("Enter valid pincode ❗");
+      return;
+    }
+
     const newAddress = {
       name,
       phone,
@@ -111,25 +108,26 @@ function Delivery() {
   };
 
   return(
+    <>
+    <Toolbar/>
 
     <div style={{
       minHeight:"100vh",
-      background:"linear-gradient(135deg,#f8fafc,#e2e8f0)",
+      background: colors.bg,
       padding:"40px"
     }}>
 
       <div style={{
         maxWidth:"600px",
         margin:"auto",
-        background:"white",
+        background: colors.card,
         padding:"30px",
         borderRadius:"20px",
-        boxShadow:"0 15px 40px rgba(0,0,0,0.08)"
+        boxShadow:"0 10px 25px rgba(0,0,0,0.05)"
       }}>
 
-        <h1>Delivery Address 📍</h1>
+        <h1 style={{color: colors.text}}>Delivery Address </h1>
 
-        {/* BUTTONS */}
         <div style={{ display:"flex", gap:"12px", marginBottom:"15px" }}>
 
           <button onClick={() => navigate("/menu")} style={btnBack}>
@@ -137,38 +135,34 @@ function Delivery() {
           </button>
 
           <button onClick={getLocation} style={btnLocation}>
-            📍 Detect My Location
+             Detect My Location
           </button>
 
         </div>
 
-        {/* LOADING */}
         {loadingLocation && (
-          <p style={{marginBottom:"10px"}}>Detecting location...</p>
+          <p style={{color: colors.muted}}>Detecting location...</p>
         )}
 
-        {/* SHOW LAT LNG */}
         {lat && lng && (
           <div style={locationBox}>
-            📍 Location detected <br/>
-            Lat: {lat} <br/>
-            Lng: {lng}
+            📍 Location detected
           </div>
         )}
-        <p style={{color:"#666", fontSize:"13px", marginBottom:"10px"}}>
-  📍 Please verify your address before saving
-</p>
-        {/* SAVED ADDRESSES */}
+
+        <p style={{color: colors.muted, fontSize:"13px"}}>
+          Please verify your address before saving
+        </p>
+
         {savedAddress.length > 0 && (
           <div style={{marginBottom:"20px"}}>
 
-            <h3>Saved Addresses 🏠</h3>
+            <h3 style={{color: colors.text}}>Saved Addresses </h3>
 
             {savedAddress.map((addr,index)=>(
 
               <div key={index} style={card}>
 
-                {/* DELETE */}
                 <button
                   onClick={() => {
                     const updated = savedAddress.filter((_, i) => i !== index);
@@ -181,9 +175,11 @@ function Delivery() {
                 </button>
 
                 <p><strong>{addr.name}</strong></p>
-                <p>{addr.phone}</p>
-                <p>{addr.address}</p>
-                <p>{addr.city} - {addr.pincode}</p>
+                <p style={{color: colors.muted}}>{addr.phone}</p>
+                <p style={{color: colors.text}}>{addr.address}</p>
+                <p style={{color: colors.muted}}>
+                  {addr.city} - {addr.pincode}
+                </p>
 
                 <button
                   onClick={()=>{
@@ -206,7 +202,6 @@ function Delivery() {
           </div>
         )}
 
-        {/* FORM */}
         <input placeholder="Full Name" value={name} onChange={(e)=>setName(e.target.value)} style={inputStyle}/>
         <input placeholder="Phone Number" value={phone} onChange={(e)=>setPhone(e.target.value)} style={inputStyle}/>
         <input placeholder="Address" value={address} onChange={(e)=>setAddress(e.target.value)} style={inputStyle}/>
@@ -219,6 +214,7 @@ function Delivery() {
 
       </div>
     </div>
+    </>
   );
 }
 
@@ -230,12 +226,12 @@ const inputStyle = {
   padding:"12px",
   marginTop:"12px",
   borderRadius:"8px",
-  border:"1px solid #ccc"
+  border:"1px solid #d6ccc2"
 };
 
 const btnBack = {
   padding:"8px 16px",
-  background:"#444",
+  background: colors.primary,
   color:"white",
   border:"none",
   borderRadius:"8px",
@@ -244,7 +240,7 @@ const btnBack = {
 
 const btnLocation = {
   padding:"8px 16px",
-  background:"#444",
+  background: colors.secondary,
   color:"white",
   border:"none",
   borderRadius:"8px",
@@ -252,14 +248,15 @@ const btnLocation = {
 };
 
 const locationBox = {
-  background:"#f1f5f9",
+  background: colors.accent,
   padding:"10px",
   borderRadius:"8px",
-  marginBottom:"15px"
+  marginBottom:"15px",
+  color:"#fff"
 };
 
 const card = {
-  background:"#f8fafc",
+  background: colors.bg,
   padding:"15px",
   borderRadius:"10px",
   marginTop:"10px",
@@ -275,13 +272,13 @@ const deleteBtn = {
   background:"transparent",
   cursor:"pointer",
   fontSize:"16px",
-  color:"#888"
+  color: colors.muted
 };
 
 const btnUse = {
   marginTop:"8px",
   padding:"6px 12px",
-  background:"#111",
+  background: colors.primary,
   color:"white",
   border:"none",
   borderRadius:"6px",
@@ -294,7 +291,7 @@ const btnSave = {
   padding:"12px",
   border:"none",
   borderRadius:"10px",
-  background:"#10b981",
+  background: colors.primary,
   color:"white",
   fontWeight:"bold",
   cursor:"pointer"

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { colors } from "../theme";
 
 function BookTable() {
 
@@ -13,7 +14,6 @@ function BookTable() {
 
   const handleBooking = async () => {
 
-    // validation check
     if (!name.trim() || !phone.trim() || !date || !time || guests < 1) {
       alert("Please fill all booking details ❗");
       return;
@@ -50,36 +50,30 @@ function BookTable() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "linear-gradient(135deg,#f8fafc,#e2e8f0)"
+        background: colors.bg
       }}
     >
       <div
         style={{
           width: "90%",
-          maxWidth: "580px",  
-          background: "white",
+          maxWidth: "580px",
+          background: colors.card,
           padding: "30px",
-          borderRadius: "16px",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
+          borderRadius: "20px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.05)"
         }}
       >
 
         <button
           onClick={() => navigate("/menu")}
-          style={{
-            marginBottom:"20px",
-            padding:"8px 16px",
-            background:"#444",
-            color:"white",
-            border:"none",
-            borderRadius:"8px",
-            cursor:"pointer"
-          }}
+          style={backBtn}
         >
           ← Back
         </button>
 
-        <h1 style={{marginBottom:"20px"}}>Book a Table 🍽</h1>
+        <h1 style={{ marginBottom:"20px", color: colors.text }}>
+          Book a Table 🍽
+        </h1>
 
         <input
           placeholder="Your Name"
@@ -118,17 +112,7 @@ function BookTable() {
 
         <button
           onClick={handleBooking}
-          style={{
-            width:"100%",
-            padding:"12px",
-            marginTop:"10px",
-            background:"#16a34a",
-            color:"white",
-            border:"none",
-            borderRadius:"10px",
-            fontSize:"16px",
-            cursor:"pointer"
-          }}
+          style={btnPrimary}
         >
           Book Table
         </button>
@@ -138,13 +122,39 @@ function BookTable() {
   );
 }
 
+/* STYLES */
+
 const inputStyle = {
   width: "100%",
   padding: "12px",
   marginBottom: "12px",
   borderRadius: "8px",
-  border: "1px solid #ccc",
+  border: "1px solid #d6ccc2",
+  background: colors.bg,
   fontSize: "15px"
+};
+
+const backBtn = {
+  marginBottom:"20px",
+  padding:"8px 16px",
+  background: colors.primary,
+  color:"white",
+  border:"none",
+  borderRadius:"8px",
+  cursor:"pointer"
+};
+
+const btnPrimary = {
+  width:"100%",
+  padding:"12px",
+  marginTop:"10px",
+  background: colors.primary,
+  color:"white",
+  border:"none",
+  borderRadius:"10px",
+  fontSize:"15px",
+  cursor:"pointer",
+  fontWeight:"500"
 };
 
 export default BookTable;

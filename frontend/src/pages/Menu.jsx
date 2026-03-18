@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { colors } from "../theme";
+import Toolbar from "../components/Toolbar";
 function Menu() {
   const [restaurants, setRestaurants] = useState([]);
   const navigate = useNavigate();
@@ -13,14 +14,19 @@ function Menu() {
   }, []);
 
   return (
+    <>
+    <Toolbar/>
     <div
       style={{
         minHeight: "100vh",
         padding: "40px",
-        background: "linear-gradient(to right, #fdfbfb, #ebedee)"
+        background: colors.bg   // ✅ fixed
       }}
     >
-      <h1 style={{ marginBottom: "30px" }}>
+      <h1 style={{ 
+        marginBottom: "30px",
+        color: colors.text      // ✅ fixed
+      }}>
         Explore Restaurants 🍽️
       </h1>
 
@@ -36,12 +42,19 @@ function Menu() {
             key={restaurant._id}
             onClick={() => navigate(`/restaurant/${restaurant._id}`)}
             style={{
-              background: "#fff",
-              borderRadius: "20px",
-              boxShadow: "0 15px 35px rgba(0,0,0,0.1)",
+              background: colors.card,   // ✅ fixed
+              borderRadius: "18px",
+              boxShadow: "0 8px 20px rgba(0,0,0,0.05)", // softer
               overflow: "hidden",
               cursor: "pointer",
-              transition: "0.3s"
+              transition: "0.25s ease"
+            }}
+
+            onMouseEnter={(e)=>{
+              e.currentTarget.style.transform = "translateY(-5px)";
+            }}
+            onMouseLeave={(e)=>{
+              e.currentTarget.style.transform = "translateY(0)";
             }}
           >
             <img
@@ -54,12 +67,35 @@ function Menu() {
               }}
             />
 
-            <div style={{ padding: "20px" }}>
-              <h2>{restaurant.name}</h2>
-              <p>⭐ {restaurant.rating}</p>
-              <p>{restaurant.deliveryTime}</p>
-              <p>{restaurant.priceRange}</p>
-              <p style={{ color: restaurant.isOpen ? "green" : "red" }}>
+            <div style={{ padding: "18px" }}>
+              <h2 style={{ 
+                color: colors.text,
+                marginBottom: "6px"
+              }}>
+                {restaurant.name}
+              </h2>
+
+              <p style={{ color: colors.muted }}>
+                ⭐ {restaurant.rating}
+              </p>
+
+              <p style={{ color: colors.muted }}>
+                {restaurant.deliveryTime}
+              </p>
+
+              <p style={{ color: colors.muted }}>
+                {restaurant.priceRange}
+              </p>
+
+              <p
+                style={{
+                  marginTop: "6px",
+                  fontWeight: "500",
+                  color: restaurant.isOpen 
+                    ? colors.primary   // ✅ green tone
+                    : "#b91c1c"        // soft red (keep for clarity)
+                }}
+              >
                 {restaurant.isOpen ? "Open" : "Closed"}
               </p>
             </div>
@@ -67,6 +103,7 @@ function Menu() {
         ))}
       </div>
     </div>
+    </>
   );
 }
 

@@ -4,7 +4,19 @@
   padding: 2rem;
   text-align: center;
 }
+:root {
+  --bg: #FAF7F2;
+  --card: #EADBC8;
+  --text: #2F2F2F;
+  --primary: #588157;
+}
 
+.dark {
+  --bg: #2F2F2F;
+  --card: #3a3a3a;
+  --text: #FAF7F2;
+  --primary: #588157;
+}
 .logo {
   height: 6em;
   padding: 1.5em;

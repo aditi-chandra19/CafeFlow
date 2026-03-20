@@ -73,7 +73,8 @@ const styles = {
   },
 
   card: {
-    background: "#eadbc8", // almond cream
+    background: "var(--card)",
+color: "var(--text)", // almond cream
     padding: "40px",
     borderRadius: "20px",
     textAlign: "center",

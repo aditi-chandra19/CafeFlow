@@ -29,7 +29,9 @@ function Register() {
   return (
     <div style={container}>
       <form onSubmit={handleRegister} style={card}>
-        <h2 style={{ marginBottom: "20px" }}>CafeFlow Register</h2>
+        <h2 style={heading}>CafeFlow</h2>
+        <p style={subtext}>Create your account</p>
+
         <input
           type="text"
           placeholder="Full Name"
@@ -38,6 +40,7 @@ function Register() {
           style={input}
           required
         />
+
         <input
           type="email"
           placeholder="Email"
@@ -59,45 +62,80 @@ function Register() {
         <button type="submit" style={button}>
           Register
         </button>
+
+        {/* LOGIN LINE */}
+        <p style={loginText}>
+          Already have an account?{" "}
+          <span style={loginLink} onClick={() => navigate("/login")}>
+            Login
+          </span>
+        </p>
       </form>
     </div>
   );
 }
+
+/* 🎨 EXACT PALETTE */
 
 const container = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   height: "100vh",
-  background: "#f4f6f9",
+  background: "#FAF7F2", // main background
 };
 
 const card = {
-  background: "white",
+  background: "var(--card)",
+color: "var(--text)", // card beige
   padding: "40px",
-  borderRadius: "12px",
+  borderRadius: "25px",
   width: "350px",
-  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
   textAlign: "center",
+  boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+};
+
+const heading = {
+  marginBottom: "5px",
+  color: "#2F2F2F",
+};
+
+const subtext = {
+  marginBottom: "20px",
+  color: "#848560", // olive tone
 };
 
 const input = {
   width: "100%",
-  padding: "10px",
+  padding: "12px",
   marginBottom: "15px",
-  borderRadius: "8px",
-  border: "1px solid #ccc",
+  borderRadius: "10px",
+  border: "none",
+  background: "#FAF7F2",
+  outline: "none",
+  color: "#2F2F2F",
 };
 
 const button = {
   width: "100%",
-  padding: "10px",
-  borderRadius: "8px",
+  padding: "12px",
+  borderRadius: "12px",
   border: "none",
-  background: "#3b82f6",
+  background: "#588157", // main green
   color: "white",
-  fontWeight: "bold",
+  fontWeight: "500",
   cursor: "pointer",
+};
+
+const loginText = {
+  marginTop: "15px",
+  color: "#848560",
+};
+
+const loginLink = {
+  color: "#B08968", // brown accent
+  cursor: "pointer",
+  fontWeight: "500",
 };
 
 export default Register;

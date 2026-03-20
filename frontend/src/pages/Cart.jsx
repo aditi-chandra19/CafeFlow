@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { colors } from "../theme";
 import Toolbar from "../components/Toolbar";
+
 function Cart() {
   const [cart, setCart] = useState([]);
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState(0);
+  const [showCoupons, setShowCoupons] = useState(false);
 
   const navigate = useNavigate();
 
@@ -55,15 +57,12 @@ function Cart() {
   const applyCoupon = () => {
     if (coupon === "SAVE10") {
       setDiscount(0.1);
-      localStorage.setItem("discount", 0.1);
       alert("10% discount applied 🎉");
     } else if (coupon === "SAVE20") {
       setDiscount(0.2);
-      localStorage.setItem("discount", 0.2);
       alert("20% discount applied 🎉");
     } else if (coupon === "LUCKYYOU") {
       setDiscount(0.5);
-      localStorage.setItem("discount", 0.5);
       alert("50% discount applied 🎉");
     } else {
       alert("Invalid coupon");
@@ -79,168 +78,214 @@ function Cart() {
 
   return (
     <>
-    <Toolbar/>
-    <div
-      style={{
-        minHeight: "100vh",
-        background: colors.bg,
-        padding: "40px 20px"
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "1000px",
-          margin: "auto",
-          background: colors.card,
-          padding: "30px",
-          borderRadius: "20px",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.05)"
-        }}
-      >
-        <button onClick={() => navigate(-1)} style={backBtn}>
-          ← Back
-        </button>
+      <Toolbar />
 
-        <h1 style={{ color: colors.text }}>Your Cart 🛒</h1>
+      <div style={page}>
+        <div style={card}>
 
-        {cart.length === 0 ? (
-          <p style={{ color: colors.muted }}>No items in cart.</p>
-        ) : (
-          <>
-            {cart.map((item, index) => (
-              <div key={index} style={itemCard}>
-                <div>
-                  <h3 style={{ color: colors.text }}>{item.name}</h3>
-                  <p style={{ color: colors.muted }}>₹ {item.price}</p>
+          <button onClick={() => navigate(-1)} style={backBtn}>
+            ← Back
+          </button>
+
+          <h1>Your Cart 🛒</h1>
+
+          {cart.length === 0 ? (
+            <p>No items in cart.</p>
+          ) : (
+            <>
+              {cart.map((item, index) => (
+                <div key={index} style={itemCard}>
+                  <div>
+                    <h3>{item.name}</h3>
+                    <p>₹ {item.price}</p>
+                  </div>
+
+                  <div>
+                    <button onClick={() => decreaseQty(index)} style={qtyBtn}>-</button>
+                    <span style={{ margin: "0 10px" }}>{item.qty}</span>
+                    <button onClick={() => increaseQty(index)} style={qtyBtn}>+</button>
+                  </div>
                 </div>
+              ))}
 
-                <div>
-                  <button onClick={() => decreaseQty(index)} style={qtyBtn}>-</button>
+              <hr />
 
-                  <span style={{ margin: "0 10px" }}>
-                    {item.qty}
-                  </span>
+              <h3>Total: ₹ {totalPrice}</h3>
 
-                  <button onClick={() => increaseQty(index)} style={qtyBtn}>+</button>
-                </div>
+              {discount > 0 && <h3 style={{ color: "green" }}>Discount Applied 🎉</h3>}
+
+              <h2>Final Price: ₹ {finalPrice}</h2>
+
+              {/* COUPON INPUT */}
+              <div style={{ marginTop: "20px" }}>
+                <input
+                  placeholder="Enter Coupon Code"
+                  value={coupon}
+                  onChange={(e) => setCoupon(e.target.value)}
+                  style={input}
+                />
+
+                <button onClick={applyCoupon} style={btn}>
+                  Apply Coupon
+                </button>
               </div>
-            ))}
 
-            <hr />
-
-            <h3 style={{ color: colors.text }}>Total: ₹ {totalPrice}</h3>
-
-            {discount > 0 && (
-              <h3 style={{ color: colors.primary }}>
-                Discount Applied 🎉
-              </h3>
-            )}
-
-            <h2 style={{ color: colors.text }}>
-              Final Price: ₹ {finalPrice}
-            </h2>
-
-            <div style={{ marginTop: "20px" }}>
-              <input
-                placeholder="Enter Coupon Code"
-                value={coupon}
-                onChange={(e) => setCoupon(e.target.value)}
-                style={inputStyle}
-              />
-
-              <button onClick={applyCoupon} style={btnStyle}>
-                Apply Coupon
+              {/* BUTTONS */}
+              <button
+                onClick={() => {
+                  localStorage.setItem("finalPrice", finalPrice);
+                  navigate("/delivery");
+                }}
+                style={primaryBtn}
+              >
+                Proceed To Payment
               </button>
-            </div>
 
-            <button
-              onClick={() => {
-                localStorage.setItem("finalPrice", finalPrice);
-                navigate("/delivery");
-              }}
-              style={btnPrimary}
-            >
-              Proceed To Payment 
-            </button>
+              <button onClick={clearCart} style={secondaryBtn}>
+                Clear Cart
+              </button>
 
-            <button onClick={clearCart} style={btnSecondary}>
-              Clear Cart
-            </button>
-          </>
-        )}
+              {/* ✅ AVAILABLE COUPONS (FIXED POSITION) */}
+              <div style={couponBox}>
+                <div
+                  style={couponHeader}
+                  onClick={() => setShowCoupons(prev => !prev)}
+                >
+                  🎁 Available Coupons
+                </div>
+
+                {showCoupons && (
+                  <div style={couponDropdown}>
+                    <div
+  style={couponItem}
+  onClick={() => {
+    setCoupon("SAVE10");
+    setDiscount(0.1);
+  }}
+>
+  <h4>FLAT10</h4>
+  <p>10% off above ₹500</p>
+</div>
+
+                    <div
+  style={couponItem}
+  onClick={() => {
+    setCoupon("SAVE20");
+    setDiscount(0.2);
+  }}
+>
+  <h4>FLAT20</h4>
+  <p>20% off up to ₹1000</p>
+</div>
+
+                    <div
+  style={couponItem}
+  onClick={() => {
+    setCoupon("LUCKYYOU");
+    setDiscount(0.5);
+  }}
+>
+  <h4>LUCKYYOU</h4>
+  <p>50% on order above ₹2000</p>
+</div>
+                  </div>
+                )}
+              </div>
+
+            </>
+          )}
+        </div>
       </div>
-    </div>
     </>
   );
 }
 
 /* STYLES */
 
+const page = {
+  minHeight: "100vh",
+  background: "#FAF7F2",
+  padding: "40px 20px"
+};
+
+const card = {
+  maxWidth: "900px",
+  margin: "auto",
+  background: "#EADBC8",
+  padding: "30px",
+  borderRadius: "20px"
+};
+
 const backBtn = {
   marginBottom: "20px",
   padding: "8px 16px",
-  background: colors.primary,
+  background: "#588157",
   color: "white",
   border: "none",
-  borderRadius: "8px",
-  cursor: "pointer"
+  borderRadius: "8px"
 };
 
 const itemCard = {
   display: "flex",
   justifyContent: "space-between",
-  alignItems: "center",
-  padding: "12px",
-  background: colors.bg,
-  marginBottom: "10px",
-  borderRadius: "10px"
+  marginBottom: "10px"
 };
 
 const qtyBtn = {
-  padding: "6px 10px",
-  borderRadius: "6px",
-  border: "none",
-  background: colors.secondary,
-  color: "white",
-  cursor: "pointer"
+  padding: "5px 10px"
 };
 
-const btnStyle = {
+const input = {
+  padding: "10px",
+  borderRadius: "8px"
+};
+
+const btn = {
   marginLeft: "10px",
-  padding: "10px 20px",
-  background: colors.secondary,
-  color: "white",
-  border: "none",
-  borderRadius: "8px",
-  cursor: "pointer"
+  padding: "10px"
 };
 
-const btnPrimary = {
+const primaryBtn = {
   marginTop: "20px",
-  padding: "12px 20px",
-  background: colors.primary,
+  padding: "12px",
+  background: "#588157",
   color: "white",
   border: "none",
-  borderRadius: "8px",
-  cursor: "pointer"
+  borderRadius: "8px"
 };
 
-const btnSecondary = {
+const secondaryBtn = {
   marginTop: "10px",
   marginLeft: "10px",
-  padding: "10px 16px",
-  background: colors.secondary,
+  padding: "10px",
+  background: "#b08968",
   color: "white",
   border: "none",
-  borderRadius: "8px",
-  cursor: "pointer"
+  borderRadius: "8px"
 };
 
-const inputStyle = {
+const couponBox = {
+  marginTop: "20px"
+};
+
+const couponHeader = {
+  padding: "12px",
+  background: "#EADBC8",
+  borderRadius: "10px",
+  cursor: "pointer",
+  fontWeight: "500"
+};
+
+const couponDropdown = {
+  marginTop: "10px",
+  background: "#FAF7F2",
+  padding: "15px",
+  borderRadius: "10px"
+};
+
+const couponItem = {
   padding: "10px",
-  borderRadius: "8px",
-  border: "1px solid #d6ccc2",
-  background: colors.card
+  borderBottom: "1px solid #ccc"
 };
 
 export default Cart;

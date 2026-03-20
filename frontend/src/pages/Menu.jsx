@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { colors } from "../theme";
+
 import Toolbar from "../components/Toolbar";
 function Menu() {
+  const [search, setSearch] = useState("");
   const [restaurants, setRestaurants] = useState([]);
   const navigate = useNavigate();
 

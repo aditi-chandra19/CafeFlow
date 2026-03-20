@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
+
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Favorites from "./pages/Favorites";
@@ -15,12 +16,13 @@ import OrderHistory from "./pages/OrderHistory";
 import Dashboard from "./pages/Dashboard";
 import BookTable from "./pages/BookTable";
 import Delivery from "./pages/Delivery";
+import DiningTransactions from "./pages/DiningTransactions";
+import Bookings from "./pages/Bookings";
+import DiningHelp from "./pages/DiningHelp";
 
 function App() {
-
   return (
     <BrowserRouter>
-
       <Routes>
 
         {/* AUTH */}
@@ -37,6 +39,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route path="/profile" element={<Profile />} />
         <Route path="/delivery" element={<Delivery />} />
 
@@ -113,6 +116,34 @@ function App() {
           }
         />
 
+        {/* 🍽️ DINING FEATURES (FIXED POSITION) */}
+        <Route
+          path="/transactions"
+          element={
+            <ProtectedRoute>
+              <DiningTransactions />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/bookings"
+          element={
+            <ProtectedRoute>
+              <Bookings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/help"
+          element={
+            <ProtectedRoute>
+              <DiningHelp />
+            </ProtectedRoute>
+          }
+        />
+
         {/* ADMIN */}
         <Route
           path="/dashboard"
@@ -124,7 +155,6 @@ function App() {
         />
 
       </Routes>
-
     </BrowserRouter>
   );
 }

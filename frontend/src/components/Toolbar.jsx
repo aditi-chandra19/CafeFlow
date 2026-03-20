@@ -17,6 +17,9 @@ function Toolbar() {
 
         {/* LEFT */}
         <div style={left}>
+          
+          
+
           <span style={logo} onClick={()=>navigate("/menu")}>
             ☕ CafeFlow
           </span>
@@ -31,18 +34,13 @@ function Toolbar() {
 
         {/* RIGHT */}
         <div style={{position:"relative"}}>
-
-          <button
-            onClick={()=>setOpenMenu(!openMenu)}
-            style={menuBtn}
-          >
+          <button onClick={()=>setOpenMenu(!openMenu)} style={menuBtn}>
             ☰
           </button>
 
           {openMenu && (
             <div style={dropdown}>
 
-              {/* MAIN */}
               <div style={item} onClick={()=>navigate("/profile")}>
                 👤 Profile
               </div>
@@ -61,16 +59,12 @@ function Toolbar() {
                 🎁 Invite your friends
               </div>
 
-              {/* DIVIDER */}
               <hr style={divider}/>
 
-              {/* SECTION */}
-              <div style={sectionTitle}>
-                Your Experiences
-              </div>
+              <div style={sectionTitle}>Your Experiences</div>
 
               <div style={item} onClick={()=>navigate("/transactions")}>
-                🕒  Dining Transactions
+                🕒 Dining Transactions
               </div>
 
               <div style={item} onClick={()=>navigate("/bookings")}>
@@ -83,7 +77,6 @@ function Toolbar() {
 
             </div>
           )}
-
         </div>
       </div>
 
@@ -112,7 +105,6 @@ function Toolbar() {
           ))}
         </div>
       )}
-
     </>
   );
 }
@@ -120,98 +112,101 @@ function Toolbar() {
 /* STYLES */
 
 const toolbar = {
-  width:"100%",
-  padding:"12px 20px",
-  background:"#eadbc8",
-  display:"flex",
-  justifyContent:"space-between",
-  alignItems:"center",
-  position:"sticky",
-  top:0,
-  zIndex:1000
+  width: "100%",
+  padding: "12px 20px",
+  background: "#EADBC8",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  position: "sticky",
+  top: 0,
+  zIndex: 3000,
 };
 
 const left = {
-  display:"flex",
-  alignItems:"center",
-  gap:"20px"
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
 };
 
 const logo = {
-  fontWeight:"700",
-  fontSize:"18px",
-  cursor:"pointer",
-  color:"#2f2f2f"
+  fontWeight: "700",
+  cursor: "pointer",
 };
 
 const location = {
-  fontSize:"13px",
-  color:"#2f2f2f"
+  fontSize: "13px",
+};
+
+const backBtn = {
+  background: "none",
+  border: "none",
+  fontSize: "18px",
+  cursor: "pointer",
 };
 
 const menuBtn = {
-  fontSize:"20px",
-  background:"none",
-  border:"none",
-  cursor:"pointer"
+  fontSize: "20px",
+  background: "none",
+  border: "none",
+  cursor: "pointer",
 };
 
 const dropdown = {
-  position:"absolute",
-  right:0,
-  top:"45px",
-  background:"white",
-  borderRadius:"12px",
-  boxShadow:"0 10px 25px rgba(0,0,0,0.1)",
-  padding:"10px",
-  width:"220px"
+  position: "absolute",
+  right: 0,
+  top: "45px",
+  background: "white",
+  borderRadius: "12px",
+  padding: "10px",
+  width: "220px",
+  zIndex: 2000,
 };
 
 const item = {
-  padding:"10px",
-  cursor:"pointer",
-  borderRadius:"8px"
+  padding: "10px",
+  cursor: "pointer",
+  borderRadius: "8px",
 };
 
 const divider = {
-  margin:"8px 0",
-  border:"none",
-  borderTop:"1px solid #eee"
+  margin: "8px 0",
+  border: "none",
+  borderTop: "1px solid #eee",
 };
 
 const sectionTitle = {
-  fontSize:"12px",
-  color:"#888",
-  padding:"5px 10px"
+  fontSize: "12px",
+  color: "#888",
+  padding: "5px 10px",
 };
 
 const addressBox = {
-  position:"absolute",
-  top:"60px",
-  left:"20px",
-  background:"white",
-  padding:"15px",
-  borderRadius:"10px",
-  boxShadow:"0 10px 25px rgba(0,0,0,0.1)",
-  width:"260px",
-  zIndex:1000
+  position: "absolute",
+  top: "60px",
+  left: "20px",
+  background: "white",
+  padding: "15px",
+  borderRadius: "10px",
+  width: "260px",
+  zIndex: 2000,
 };
 
 const addressItem = {
-  marginBottom:"10px",
-  padding:"10px",
-  border:"1px solid #eee",
-  borderRadius:"8px"
+  marginBottom: "10px",
+  padding: "10px",
+  border: "1px solid #eee",
+  borderRadius: "8px",
 };
 
 const useBtn = {
-  marginTop:"5px",
-  padding:"5px 10px",
-  background:"#588157",
-  color:"white",
-  border:"none",
-  borderRadius:"6px",
-  cursor:"pointer"
+  marginTop: "5px",
+  padding: "5px 10px",
+  background: "#588157",
+  color: "white",
+  border: "none",
+  borderRadius: "6px",
+  cursor: "pointer",
 };
 
 export default Toolbar;

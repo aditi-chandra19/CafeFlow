@@ -36,7 +36,7 @@ function Login() {
     <div style={container}>
       <form onSubmit={handleLogin} style={card}>
         
-        <h2 style={title}> CafeFlow ☕</h2>
+        <h2 style={title}> CafeFlow </h2>
         <p style={subtitle}>Welcome Back</p>
 
         <input
@@ -87,7 +87,8 @@ const container = {
 };
 
 const card = {
-  background: "#eadbc8", // almond cream
+  background: "var(--card)",
+color: "var(--text)", // almond cream
   padding: "40px",
   borderRadius: "20px",
   width: "350px",

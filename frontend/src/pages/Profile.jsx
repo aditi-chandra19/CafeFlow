@@ -35,8 +35,13 @@ function Profile() {
 
       <div style={container}>
 
-        <h2 style={{marginBottom:"20px"}}>Your Profile</h2>
+  {/* BACK BUTTON */}
+  <button style={backBtn} onClick={() => navigate(-1)}>
+    ← Back
+  </button>
 
+  <h2 style={{marginBottom:"20px"}}>Your Profile</h2>
+      
         <input
           placeholder="Name"
           value={name}
@@ -86,7 +91,19 @@ function Profile() {
 }
 
 /* STYLES */
-
+const backBtn = {
+  background: "#588157",       // green
+  color: "white",
+  border: "none",
+  padding: "10px 18px",
+  borderRadius: "12px",        // rounded corners
+  cursor: "pointer",
+  fontSize: "14px",
+  fontWeight: "500",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "6px",
+};
 const container = {
   maxWidth:"500px",
   margin:"auto",

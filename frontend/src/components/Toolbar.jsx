@@ -74,7 +74,17 @@ function Toolbar() {
               <div style={item} onClick={()=>navigate("/help")}>
                 ❓ Dining Help
               </div>
+              <hr style={divider} />
 
+<div
+  style={{ ...item, color: "#b91c1c", fontWeight: "bold" }}
+  onClick={() => {
+    localStorage.clear();   // clear user/cart/session
+    navigate("/login");     // go to login page
+  }}
+>
+  🚪 Logout
+</div>
             </div>
           )}
         </div>
@@ -113,7 +123,7 @@ function Toolbar() {
 
 const toolbar = {
   width: "100%",
-  padding: "12px 20px",
+  padding: "12px ",
   background: "#EADBC8",
   display: "flex",
   justifyContent: "space-between",

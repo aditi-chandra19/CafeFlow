@@ -86,8 +86,8 @@ const container = {
 };
 
 const card = {
-  background: "var(--card)",
-color: "var(--text)", // card beige
+  background: "#EADBC8",
+  color: "var(--text)", // card beige
   padding: "40px",
   borderRadius: "25px",
   width: "350px",
@@ -110,7 +110,7 @@ const input = {
   padding: "12px",
   marginBottom: "15px",
   borderRadius: "10px",
-  border: "none",
+  border: "1px solid #d6ccc2",
   background: "#FAF7F2",
   outline: "none",
   color: "#2F2F2F",
@@ -126,7 +126,15 @@ const button = {
   fontWeight: "500",
   cursor: "pointer",
 };
-
+<p style={{ marginTop: "15px", color: "#2F2F2F" }}>
+  Already a user?{" "}
+  <span
+    onClick={() => navigate("/login")}
+    style={{ color: "#588157", cursor: "pointer", fontWeight: "bold" }}
+  >
+    Login
+  </span>
+</p>
 const loginText = {
   marginTop: "15px",
   color: "#848560",

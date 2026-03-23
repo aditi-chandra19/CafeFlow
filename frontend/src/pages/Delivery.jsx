@@ -3,26 +3,27 @@ import { useNavigate } from "react-router-dom";
 import { colors } from "../theme";
 import Toolbar from "../components/Toolbar";
 function Delivery() {
-
   const navigate = useNavigate();
-
   const [name,setName] = useState("");
   const [phone,setPhone] = useState("");
   const [address,setAddress] = useState("");
   const [city,setCity] = useState("");
   const [pincode,setPincode] = useState("");
-
   const [lat,setLat] = useState(null);
   const [lng,setLng] = useState(null);
-
   const [savedAddress,setSavedAddress] = useState([]);
   const [loadingLocation,setLoadingLocation] = useState(false);
-
+  const [orders, setOrders] = useState([]);
   useEffect(()=>{
     const saved = JSON.parse(localStorage.getItem("addresses")) || [];
     setSavedAddress(saved);
   },[]);
+  useEffect(() => {
+  const savedOrders =
+    JSON.parse(localStorage.getItem("orderHistory")) || [];
 
+  setOrders(savedOrders);
+}, []);
   const getAddressFromCoords = async (lat, lng) => {
     try {
       const res = await fetch(

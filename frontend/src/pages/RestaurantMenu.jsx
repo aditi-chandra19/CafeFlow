@@ -13,11 +13,12 @@ function RestaurantMenu() {
   const [search, setSearch] = useState(""); // ✅ correct place
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const cartCount = JSON.parse(localStorage.getItem("cart") || "[]").length;
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     if (!id) return;
-
+const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+setCartCount(savedCart.length);
     fetch(`http://localhost:5000/restaurants/${id}`)
       .then(res => res.json())
       .then(data => setRestaurant(data));
@@ -30,19 +31,25 @@ function RestaurantMenu() {
 
   // ADD TO CART
   const addToCart = (item) => {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    const existingItem = cart.find(i => i._id === item._id);
+  const newItem = {
+    _id: item._id,
+    name: item.name,
+    price: item.price,
+    qty: 1,
 
-    if (existingItem) {
-      existingItem.qty = (existingItem.qty || 1) + 1;
-    } else {
-      cart.push({ ...item, qty: 1 });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert(`${item.name} added to cart 🛒`);
+    // 🔥 ADD THIS (HARDCODE TEMP IF NEEDED)
+    restaurantId: restaurant._id ,
+    restaurantName: restaurant.name 
   };
+
+  cart.push(newItem);
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+   setCartCount(cart.length);
+  alert(`${item.name} added to cart 🛒`);
+};
 
   // FAVORITES
   const addToFavorites = (item) => {

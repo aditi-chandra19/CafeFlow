@@ -19,8 +19,34 @@ import Delivery from "./pages/Delivery";
 import DiningTransactions from "./pages/DiningTransactions";
 import Bookings from "./pages/Bookings";
 import DiningHelp from "./pages/DiningHelp";
-
+import OrderSummary from "./pages/OrderSummary";
 function App() {
+  const cartItems = [
+  {
+    restaurantId: "1",
+    restaurantName: "Cafe Brew",
+    itemId: "101",
+    name: "Cold Coffee",
+    price: 120,
+    quantity: 1
+  },
+  {
+    restaurantId: "2",
+    restaurantName: "Sweet Treats",
+    itemId: "202",
+    name: "Chocolate Cake",
+    price: 200,
+    quantity: 1
+  },
+  {
+    restaurantId: "1",
+    restaurantName: "Cafe Brew",
+    itemId: "103",
+    name: "Sandwich",
+    price: 150,
+    quantity: 1
+  }
+];
   return (
     <BrowserRouter>
       <Routes>
@@ -29,7 +55,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
+        <Route path="/summary" element={<OrderSummary />} />
         {/* MENU */}
         <Route
           path="/menu"
@@ -75,7 +101,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+           
         {/* PAYMENT */}
         <Route
           path="/payment"

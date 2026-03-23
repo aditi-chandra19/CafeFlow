@@ -1,91 +1,118 @@
 import { useNavigate } from "react-router-dom";
+import Toolbar from "../components/Toolbar";
 
 function DiningTransactions() {
+
   const navigate = useNavigate();
 
   const transactions = [
     {
-      id: 1,
-      restaurant: "Cafe Mocha",
+      name: "Cafe Mocha",
       date: "20 March 2026",
-      amount: "₹450",
-      status: "Completed",
+      amount: 450
     },
     {
-      id: 2,
-      restaurant: "Green Bowl",
+      name: "Green Bowl",
       date: "18 March 2026",
-      amount: "₹320",
-      status: "Completed",
-    },
+      amount: 320
+    }
   ];
 
   return (
-    <div style={container}>
-      <div style={card}>
-        
-        <button style={backBtn} onClick={() => navigate(-1)}>
+    <>
+      <Toolbar />
+
+      <div style={page}>
+
+        <button onClick={() => navigate(-1)} style={backBtn}>
           ← Back
         </button>
 
-        <h2 style={heading}>Dining Transactions</h2>
+        <h1 style={title}>Dining Transactions</h1>
 
-        {transactions.map((item) => (
-          <div key={item.id} style={transactionCard}>
-            <h4>{item.restaurant}</h4>
-            <p>{item.date}</p>
-            <p>{item.amount}</p>
-            <span style={status}>{item.status}</span>
+        {transactions.map((t, index) => (
+          <div key={index} style={card}>
+
+            <div style={topRow}>
+              <h2 style={restaurant}>{t.name}</h2>
+              <span style={status}>Completed</span>
+            </div>
+
+            <p style={date}>{t.date}</p>
+
+            <div style={bottomRow}>
+              <span style={amount}>₹ {t.amount}</span>
+            </div>
+
           </div>
         ))}
 
       </div>
-    </div>
+    </>
   );
 }
 
-/* 🎨 STYLES */
+/* STYLES */
 
-const container = {
+const page = {
   minHeight: "100vh",
   background: "#FAF7F2",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
+  padding: "40px 20px"
+};
+
+const title = {
+  marginBottom: "20px",
+  color: "#2F2F2F"
 };
 
 const card = {
-  background: "var(--card)",
-color: "var(--text)",
-  padding: "30px",
-  borderRadius: "20px",
-  width: "400px",
-};
-
-const heading = {
+  background: "#EADBC8",
+  padding: "20px",
+  borderRadius: "15px",
   marginBottom: "20px",
+  boxShadow: "0 4px 10px rgba(0,0,0,0.05)"
 };
 
-const transactionCard = {
-  background: "#FAF7F2",
-  padding: "12px",
-  borderRadius: "10px",
-  marginBottom: "10px",
+const topRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center"
+};
+
+const restaurant = {
+  margin: 0
+};
+
+const date = {
+  marginTop: "5px",
+  color: "#555"
+};
+
+const bottomRow = {
+  marginTop: "10px"
+};
+
+const amount = {
+  fontWeight: "bold",
+  fontSize: "18px"
 };
 
 const status = {
-  color: "#588157",
-  fontWeight: "bold",
+  background: "#A3B18A",
+  color: "white",
+  padding: "5px 10px",
+  borderRadius: "20px",
+  fontSize: "12px"
 };
 
 const backBtn = {
+  marginBottom: "20px",
+  padding: "8px 16px",
   background: "#588157",
   color: "white",
   border: "none",
-  padding: "8px 12px",
   borderRadius: "8px",
-  cursor: "pointer",
-  marginBottom: "15px",
+  cursor: "pointer"
 };
 
 export default DiningTransactions;

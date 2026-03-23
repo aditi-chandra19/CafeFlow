@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import Toolbar from "../components/Toolbar";
 import { colors } from "../theme";
-
+import { useNavigate } from "react-router-dom";
 function Favorites() {
-
+const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
@@ -22,7 +22,9 @@ function Favorites() {
   return (
     <>
       <Toolbar />
-
+<button onClick={() => navigate(-1)} style={backBtn}>
+  ← Back
+</button>
       <div style={{
         maxWidth:"1000px",
         margin:"auto",
@@ -78,5 +80,13 @@ function Favorites() {
     </>
   );
 }
-
+const backBtn = {
+  margin: "20px",
+  padding: "8px 16px",
+  background: "#588157",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer"
+};
 export default Favorites;

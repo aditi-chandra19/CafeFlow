@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { colors } from "../theme";
 import Toolbar from "../components/Toolbar";
+
 function Payment() {
   const navigate = useNavigate();
 
-  const [cart, setCart] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [delivery, setDelivery] = useState(null);
-  const [discount, setDiscount] = useState(0);
 
   const [paymentMethod, setPaymentMethod] = useState(null);
 
@@ -18,247 +18,267 @@ function Payment() {
 
   const [upiId, setUpiId] = useState("");
 
+  // ✅ LOAD CART → CONVERT TO ORDERS
   useEffect(() => {
-    const savedCart =
-      JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(savedCart);
+    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    const details =
-      JSON.parse(localStorage.getItem("deliveryDetails"));
+    const grouped = savedCart.reduce((acc, item) => {
+      if (!acc[item.restaurantId]) {
+        acc[item.restaurantId] = [];
+      }
+      acc[item.restaurantId].push(item);
+      return acc;
+    }, {});
+
+    const formattedOrders = Object.keys(grouped).map((restId) => {
+      const items = grouped[restId];
+
+      const total = items.reduce(
+        (sum, item) => sum + item.price * item.qty,
+        0
+      );
+
+      return {
+        orderId: Date.now() + Math.random(),
+        restaurantId: restId,
+        restaurantName: items[0].restaurantName,
+        items,
+        totalAmount: total
+      };
+    });
+
+    setOrders(formattedOrders);
+
+    const details = JSON.parse(localStorage.getItem("deliveryDetails"));
     setDelivery(details);
-
-    const savedDiscount = localStorage.getItem("discount");
-    if (savedDiscount) {
-      setDiscount(Number(savedDiscount));
-    }
   }, []);
 
-  const subtotal = cart.reduce(
-    (total, item) => total + item.price * (item.qty || 1),
+  // ✅ TOTAL
+  const totalAmount = orders.reduce(
+    (sum, order) => sum + order.totalAmount,
     0
   );
 
-  const totalPrice = subtotal - subtotal * discount;
-
-  const placeOrder = async () => {
-    if (!delivery) {
-      alert("Delivery address missing ❗");
-      navigate("/delivery");
+  // ✅ PLACE ORDER (FINAL CLEAN VERSION)
+  const placeOrder = () => {
+    const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
+    if (!orders || orders.length === 0) {
+      alert("Cart is empty ❗");
       return;
     }
 
-    const token = localStorage.getItem("token");
-
-    try {
-      const res = await fetch(
-        "http://localhost:5000/place-order",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token
-          },
-          body: JSON.stringify({
-            items: cart,
-            total: totalPrice,
-            delivery
-          })
-        }
-      );
-
-      const data = await res.json();
-      alert(data.message);
-
-      localStorage.removeItem("cart");
-      navigate("/success");
-
-    } catch (error) {
-      console.log(error);
+    if (!delivery) {
+      alert("Delivery address missing ❗");
+      navigate("/menu");
+      return;
     }
+
+    // ✅ SAVE ORDER HISTORY
+    const existingHistory =
+      JSON.parse(localStorage.getItem("orderHistory")) || [];
+
+    const deliveryBoys = ["Rider 21 🚴", "Rider 45 🛵", "Rider 60 🚲", "Rider 88 🚗"];
+
+const ordersWithDate = orders.map(order => ({
+  ...order,
+  date: new Date().toLocaleString(),
+
+  // ✅ assign random delivery partner
+  deliveryPartner:
+    deliveryBoys[Math.floor(Math.random() * deliveryBoys.length)],
+
+  status: "Preparing"
+}));
+
+    localStorage.setItem(
+      "orderHistory",
+      JSON.stringify([...existingHistory, ...ordersWithDate])
+    );
+
+    // ✅ CLEAR CART
+    localStorage.removeItem("cart");
+
+    // ✅ SUCCESS FLOW
+    alert("Order placed successfully 🎉");
+    navigate("/success");
   };
 
   return (
     <>
-    <Toolbar/>
-    <div
-      style={{
-        minHeight: "100vh",
-        background: colors.bg,
-        padding: "40px 20px"
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "1100px",
-          margin: "auto",
-          background: colors.card,
-          padding: "30px",
-          borderRadius: "20px",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.05)"
-        }}
-      >
-        <button onClick={() => navigate(-1)} style={backBtn}>
-          ← Back
-        </button>
+      <Toolbar />
 
-        <h1 style={{ color: colors.text }}>Payment 💳</h1>
+      <div style={page}>
+        <div style={card}>
 
-        <h3 style={{ color: colors.text }}>Order Summary</h3>
+          <button onClick={() => navigate(-1)} style={backBtn}>
+            ← Back
+          </button>
 
-        {cart.map((item, index) => (
-          <div key={index} style={itemCard}>
-            <div>
-              <strong style={{ fontSize: "16px", color: colors.text }}>
-                {item.name}
-              </strong>
-              <p style={{ color: colors.muted }}>
-                Qty: {item.qty || 1}
-              </p>
+          <h1 style={{ color: colors.text }}>Payment 💳</h1>
+
+          <h3 style={{ color: colors.text }}>Order Summary</h3>
+
+          {orders.map((order) => (
+            <div key={order.orderId} style={itemCard}>
+              <div>
+                <h3 style={{ color: colors.primary }}>
+                  {order.restaurantName}
+                </h3>
+
+                {order.items.map((item) => (
+                  <p key={item._id}>
+                    {item.name} x {item.qty}
+                  </p>
+                ))}
+              </div>
+
+              <div style={{ fontWeight: "bold", color: colors.text }}>
+                ₹ {order.totalAmount}
+              </div>
             </div>
+          ))}
 
-            <div style={{ fontWeight: "bold", color: colors.text }}>
-              ₹ {item.price * (item.qty || 1)}
-            </div>
+          <div style={billBox}>
+            <p>Subtotal: ₹ {totalAmount}</p>
+
+            <h2 style={{ marginTop: "10px", color: colors.text }}>
+              Total: ₹ {totalAmount}
+            </h2>
           </div>
-        ))}
 
-        {/* BILL BOX */}
-        <div style={billBox}>
-          <p>Subtotal: ₹ {subtotal}</p>
+          <hr style={{ margin: "20px 0" }} />
 
-          {discount > 0 && (
-            <p style={{ color: colors.primary }}>
-              Discount: -{discount * 100}%
-            </p>
+          <h3 style={{ color: colors.text }}>Delivery Details</h3>
+
+          {delivery ? (
+            <div style={deliveryCard}>
+              <p><strong>{delivery.name}</strong></p>
+              <p>{delivery.phone}</p>
+              <p>{delivery.address}</p>
+              <p>{delivery.city} - {delivery.pincode}</p>
+            </div>
+          ) : (
+            <p style={{ color: "red" }}>No delivery address found</p>
           )}
 
-          <h2 style={{ marginTop: "10px", color: colors.text }}>
-            Total: ₹ {totalPrice.toFixed(2)}
-          </h2>
+          <hr style={{ margin: "20px 0" }} />
+
+          <h3 style={{ color: colors.text }}>Payment Method</h3>
+
+          <button onClick={() => setPaymentMethod("card")} style={btn}>
+            Card 💳
+          </button>
+
+          <button onClick={() => setPaymentMethod("upi")} style={btn}>
+            UPI 📱
+          </button>
+
+          <button onClick={placeOrder} style={btnPrimary}>
+            Cash on Delivery 💵
+          </button>
+
+          {paymentMethod === "card" && (
+            <div style={{ marginTop: "20px" }}>
+              <input placeholder="Card Name" value={cardName}
+                onChange={(e) => setCardName(e.target.value)} style={input} />
+
+              <input placeholder="Card Number" value={cardNumber}
+                onChange={(e) => setCardNumber(e.target.value)} style={input} />
+
+              <input placeholder="MM/YY" value={expiry}
+                onChange={(e) => setExpiry(e.target.value)} style={input} />
+
+              <input placeholder="CVV" value={cvv}
+                onChange={(e) => setCvv(e.target.value)} style={input} />
+
+              <button
+                onClick={() => {
+                  if (!cardName || !cardNumber || !expiry || !cvv) {
+                    alert("Fill all details ❗");
+                    return;
+                  }
+                  placeOrder();
+                }}
+                style={btnPrimary}
+              >
+                Pay Now ✅
+              </button>
+            </div>
+          )}
+
+          {paymentMethod === "upi" && (
+            <div style={{ marginTop: "20px" }}>
+              <input
+                placeholder="example@upi"
+                value={upiId}
+                onChange={(e) => setUpiId(e.target.value)}
+                style={input}
+              />
+
+              <button
+                onClick={() => {
+                  if (!upiId.includes("@")) {
+                    alert("Invalid UPI ❗");
+                    return;
+                  }
+                  placeOrder();
+                }}
+                style={btnPrimary}
+              >
+                Pay via UPI ✅
+              </button>
+            </div>
+          )}
+
         </div>
-
-        <hr style={{ margin: "20px 0" }} />
-
-        {/* DELIVERY */}
-        <h3 style={{ color: colors.text }}>Delivery Details</h3>
-
-        {delivery ? (
-          <div style={deliveryCard}>
-            <p><strong>{delivery.name}</strong></p>
-            <p>{delivery.phone}</p>
-            <p>{delivery.address}</p>
-            <p>{delivery.city} - {delivery.pincode}</p>
-          </div>
-        ) : (
-          <p style={{ color: "red" }}>No delivery address found</p>
-        )}
-
-        <hr style={{ margin: "20px 0" }} />
-
-        <h3 style={{ color: colors.text }}>Payment Method</h3>
-
-        <button onClick={() => setPaymentMethod("card")} style={btn}>
-          Card 💳
-        </button>
-
-        <button onClick={() => setPaymentMethod("upi")} style={btn}>
-          UPI 📱
-        </button>
-
-        <button onClick={placeOrder} style={btnPrimary}>
-          Cash on Delivery 💵
-        </button>
-
-        {/* CARD */}
-        {paymentMethod === "card" && (
-          <div style={{ marginTop: "20px" }}>
-            <input placeholder="Card Name" value={cardName}
-              onChange={(e) => setCardName(e.target.value)} style={input} />
-
-            <input placeholder="Card Number" value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)} style={input} />
-
-            <input placeholder="MM/YY" value={expiry}
-              onChange={(e) => setExpiry(e.target.value)} style={input} />
-
-            <input placeholder="CVV" value={cvv}
-              onChange={(e) => setCvv(e.target.value)} style={input} />
-
-            <button
-              onClick={() => {
-                if (!cardName || !cardNumber || !expiry || !cvv) {
-                  alert("Fill all details ❗");
-                  return;
-                }
-                placeOrder();
-              }}
-              style={btnPrimary}
-            >
-              Pay Now ✅
-            </button>
-          </div>
-        )}
-
-        {/* UPI */}
-        {paymentMethod === "upi" && (
-          <div style={{ marginTop: "20px" }}>
-            <input
-              placeholder="example@upi"
-              value={upiId}
-              onChange={(e) => setUpiId(e.target.value)}
-              style={input}
-            />
-
-            <button
-              onClick={() => {
-                if (!upiId.includes("@")) {
-                  alert("Invalid UPI ❗");
-                  return;
-                }
-                placeOrder();
-              }}
-              style={btnPrimary}
-            >
-              Pay via UPI ✅
-            </button>
-          </div>
-        )}
       </div>
-    </div>
     </>
   );
 }
 
 /* STYLES */
 
+const page = {
+  minHeight: "100vh",
+  background: "#FAF7F2",
+  padding: "40px 20px"
+};
+
+const card = {
+  maxWidth: "1100px",
+  margin: "auto",
+  background: "#EADBC8",
+  padding: "30px",
+  borderRadius: "20px"
+};
+
 const backBtn = {
   marginBottom: "20px",
   padding: "8px 16px",
-  background: colors.primary,
+  background: "#588157",
   color: "white",
   border: "none",
-  borderRadius: "8px",
-  cursor: "pointer"
+  borderRadius: "8px"
 };
 
 const itemCard = {
   padding: "15px",
   marginBottom: "12px",
-  background: colors.bg,
+  background: "#FAF7F2",
   borderRadius: "12px",
   display: "flex",
   justifyContent: "space-between"
 };
 
 const billBox = {
-  background: colors.bg,
+  background: "#FAF7F2",
   padding: "18px",
   borderRadius: "12px",
   marginTop: "20px"
 };
 
 const deliveryCard = {
-  background: colors.bg,
+  background: "#FAF7F2",
   padding: "15px",
   borderRadius: "12px",
   marginBottom: "20px"
@@ -269,11 +289,10 @@ const btn = {
   width: "100%",
   margin: "10px 0",
   padding: "12px",
-  background: colors.secondary,
+  background: "#A3B18A",
   color: "white",
   border: "none",
-  borderRadius: "10px",
-  cursor: "pointer"
+  borderRadius: "10px"
 };
 
 const btnPrimary = {
@@ -281,11 +300,10 @@ const btnPrimary = {
   width: "100%",
   marginTop: "12px",
   padding: "12px",
-  background: colors.primary,
+  background: "#588157",
   color: "white",
   border: "none",
-  borderRadius: "10px",
-  cursor: "pointer"
+  borderRadius: "10px"
 };
 
 const input = {
@@ -294,7 +312,7 @@ const input = {
   marginTop: "10px",
   borderRadius: "8px",
   border: "1px solid #d6ccc2",
-  background: colors.card
+  background: "#FAF7F2"
 };
 
 export default Payment;

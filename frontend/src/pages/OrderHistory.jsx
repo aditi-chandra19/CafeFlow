@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import Toolbar from "../components/Toolbar";
+import { useNavigate } from "react-router-dom";
 
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
-
+ const navigate = useNavigate();  
   useEffect(() => {
     const fetchOrders = async () => {
       const token = localStorage.getItem("token");
+ 
 
       try {
         const res = await fetch(
@@ -32,7 +34,11 @@ function OrderHistory() {
   return (
     <>
     <Toolbar/>
+    <button onClick={() => navigate(-1)} style={backBtn}>
+  ← Back
+</button>
     <div style={{ padding: "40px" }}>
+      
       <h1>My Orders 📦</h1>
 
       {orders.length === 0 ? (
@@ -72,5 +78,13 @@ function OrderHistory() {
     </>
   );
 }
-
+const backBtn = {
+  marginBottom: "5px",
+  padding: "8px 12px",
+  background: "#588157",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer"
+};
 export default OrderHistory;

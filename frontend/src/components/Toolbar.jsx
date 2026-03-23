@@ -41,22 +41,30 @@ function Toolbar() {
           {openMenu && (
             <div style={dropdown}>
 
-              <div style={item} onClick={()=>navigate("/profile")}>
-                👤 Profile
-              </div>
+              <div style={menuItem} onClick={() => navigate("/profile")}>
+  <span style={icon}>👤</span>
+  <span>Profile</span>
+</div>
 
-              <div style={item} onClick={()=>navigate("/favorites")}>
-                ❤️ Favorites
-              </div>
+<div style={menuItem} onClick={() => navigate("/favorites")}>
+  <span style={icon}>❤️</span>
+  <span>Favorites</span>
+</div>
+
+<div style={menuItem} onClick={() => navigate("/orders")}>
+  <span style={icon}>📦</span>
+  <span>Order Summary</span>
+</div>
+
 
               <div
-                style={item}
+                style={menuItem}
                 onClick={()=>{
                   navigator.clipboard.writeText("Join CafeFlow 🍽");
                   alert("Invite link copied!");
                 }}
-              >
-                🎁 Invite your friends
+              ><span style={icon}>🎁</span>
+              <span> Invite your friends</span>
               </div>
 
               <hr style={divider}/>
@@ -218,5 +226,17 @@ const useBtn = {
   borderRadius: "6px",
   cursor: "pointer",
 };
+const menuItem = {
+  display: "flex",
+  alignItems: "center",
+  gap: "12px",
+  padding: "10px 0",
+  cursor: "pointer"
+};
 
+const icon = {
+  width: "24px",
+  display: "flex",
+  justifyContent: "center"
+};
 export default Toolbar;

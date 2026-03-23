@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { colors } from "../theme";
 import Toolbar from "../components/Toolbar";
 
 function Cart() {
@@ -10,6 +9,17 @@ function Cart() {
   const [showCoupons, setShowCoupons] = useState(false);
 
   const navigate = useNavigate();
+
+  // GROUP CART
+  const groupCart = (items) => {
+    return items.reduce((acc, item) => {
+      if (!acc[item.restaurantId]) {
+        acc[item.restaurantId] = [];
+      }
+      acc[item.restaurantId].push(item);
+      return acc;
+    }, {});
+  };
 
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -76,6 +86,13 @@ function Cart() {
 
   const finalPrice = totalPrice - totalPrice * discount;
 
+  const groupedCart = groupCart(cart);
+
+  // ✅ FINAL CHECKOUT
+  const handleCheckout = () => {
+    navigate("/delivery"); // ONLY NAVIGATION
+  };
+
   return (
     <>
       <Toolbar />
@@ -93,20 +110,37 @@ function Cart() {
             <p>No items in cart.</p>
           ) : (
             <>
-              {cart.map((item, index) => (
-                <div key={index} style={itemCard}>
-                  <div>
-                    <h3>{item.name}</h3>
-                    <p>₹ {item.price}</p>
-                  </div>
+              {Object.keys(groupedCart).map((restId) => {
+                const items = groupedCart[restId];
 
-                  <div>
-                    <button onClick={() => decreaseQty(index)} style={qtyBtn}>-</button>
-                    <span style={{ margin: "0 10px" }}>{item.qty}</span>
-                    <button onClick={() => increaseQty(index)} style={qtyBtn}>+</button>
+                return (
+                  <div key={restId} style={{ marginBottom: "25px" }}>
+                    
+                    <h2 style={{ color: "#588157" }}>
+                      {items[0].restaurantName || "Restaurant"}
+                    </h2>
+
+                    {items.map((item) => {
+                      const index = cart.findIndex(c => c._id === item._id);
+
+                      return (
+                        <div key={item._id} style={itemCard}>
+                          <div>
+                            <h3>{item.name}</h3>
+                            <p>₹ {item.price}</p>
+                          </div>
+
+                          <div>
+                            <button onClick={() => decreaseQty(index)} style={qtyBtn}>-</button>
+                            <span style={{ margin: "0 10px" }}>{item.qty}</span>
+                            <button onClick={() => increaseQty(index)} style={qtyBtn}>+</button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               <hr />
 
@@ -116,7 +150,6 @@ function Cart() {
 
               <h2>Final Price: ₹ {finalPrice}</h2>
 
-              {/* COUPON INPUT */}
               <div style={{ marginTop: "20px" }}>
                 <input
                   placeholder="Enter Coupon Code"
@@ -130,14 +163,7 @@ function Cart() {
                 </button>
               </div>
 
-              {/* BUTTONS */}
-              <button
-                onClick={() => {
-                  localStorage.setItem("finalPrice", finalPrice);
-                  navigate("/delivery");
-                }}
-                style={primaryBtn}
-              >
+              <button onClick={handleCheckout} style={primaryBtn}>
                 Proceed To Payment
               </button>
 
@@ -145,7 +171,6 @@ function Cart() {
                 Clear Cart
               </button>
 
-              {/* ✅ AVAILABLE COUPONS (FIXED POSITION) */}
               <div style={couponBox}>
                 <div
                   style={couponHeader}
@@ -156,38 +181,17 @@ function Cart() {
 
                 {showCoupons && (
                   <div style={couponDropdown}>
-                    <div
-  style={couponItem}
-  onClick={() => {
-    setCoupon("SAVE10");
-    setDiscount(0.1);
-  }}
->
-  <h4>FLAT10</h4>
-  <p>10% off above ₹500</p>
-</div>
+                    <div style={couponItem} onClick={() => { setCoupon("SAVE10"); setDiscount(0.1); }}>
+                      <h4>FLAT10</h4>
+                    </div>
 
-                    <div
-  style={couponItem}
-  onClick={() => {
-    setCoupon("SAVE20");
-    setDiscount(0.2);
-  }}
->
-  <h4>FLAT20</h4>
-  <p>20% off up to ₹1000</p>
-</div>
+                    <div style={couponItem} onClick={() => { setCoupon("SAVE20"); setDiscount(0.2); }}>
+                      <h4>FLAT20</h4>
+                    </div>
 
-                    <div
-  style={couponItem}
-  onClick={() => {
-    setCoupon("LUCKYYOU");
-    setDiscount(0.5);
-  }}
->
-  <h4>LUCKYYOU</h4>
-  <p>50% on order above ₹2000</p>
-</div>
+                    <div style={couponItem} onClick={() => { setCoupon("LUCKYYOU"); setDiscount(0.5); }}>
+                      <h4>LUCKYYOU</h4>
+                    </div>
                   </div>
                 )}
               </div>

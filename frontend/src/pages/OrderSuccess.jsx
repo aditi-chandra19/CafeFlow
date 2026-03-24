@@ -13,7 +13,7 @@ function OrderSuccess() {
 
   const timer = setTimeout(() => {
     console.log("GOING TO DELIVERY");
-    navigate("/menu");
+    navigate("/tracking");
   }, 3000);
 
   return () => clearTimeout(timer);

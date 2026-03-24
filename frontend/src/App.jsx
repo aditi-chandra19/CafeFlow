@@ -20,6 +20,7 @@ import DiningTransactions from "./pages/DiningTransactions";
 import Bookings from "./pages/Bookings";
 import DiningHelp from "./pages/DiningHelp";
 import OrderSummary from "./pages/OrderSummary";
+import LiveTracking from "./pages/LiveTracking";
 function App() {
   const cartItems = [
   {
@@ -55,6 +56,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/tracking" element={<LiveTracking />} />
         <Route path="/summary" element={<OrderSummary />} />
         {/* MENU */}
         <Route

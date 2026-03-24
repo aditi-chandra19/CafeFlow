@@ -59,7 +59,7 @@ function Payment() {
     0
   );
 
-  // ✅ PLACE ORDER (FINAL CLEAN VERSION)
+  // ✅ PLACE ORDER 
   const placeOrder = () => {
     const cartItems = JSON.parse(localStorage.getItem("cart")) || [];
     if (!orders || orders.length === 0) {
@@ -77,18 +77,34 @@ function Payment() {
     const existingHistory =
       JSON.parse(localStorage.getItem("orderHistory")) || [];
 
-    const deliveryBoys = ["Rider 21 🚴", "Rider 45 🛵", "Rider 60 🚲", "Rider 88 🚗"];
+     const deliveryBoys = [
+      "Rider 21 🚴",
+      "Rider 45 🛵",
+      "Rider 60 🚲",
+      "Rider 88 🚗"
+    ];
 
-const ordersWithDate = orders.map(order => ({
-  ...order,
-  date: new Date().toLocaleString(),
+    // ✅ ADDED: UNIQUE RIDER LOGIC
+    const usedRiders = new Set();
 
-  // ✅ assign random delivery partner
-  deliveryPartner:
-    deliveryBoys[Math.floor(Math.random() * deliveryBoys.length)],
+const ordersWithDate = orders.map(order => {
 
-  status: "Preparing"
-}));
+      let rider;
+
+      do {
+        rider = deliveryBoys[Math.floor(Math.random() * deliveryBoys.length)];
+      } while (usedRiders.has(rider));
+
+      usedRiders.add(rider);
+
+      return {
+        ...order,
+        date: new Date().toLocaleString(),
+        deliveryPartner: rider,
+        status: "Preparing"
+      };
+    });
+
 
     localStorage.setItem(
       "orderHistory",

@@ -22,7 +22,17 @@ function Delivery() {
   const savedOrders =
     JSON.parse(localStorage.getItem("orderHistory")) || [];
 
-  setOrders(savedOrders);
+  if (savedOrders.length > 0) {
+    // ✅ Only latest order
+    setOrders([savedOrders[savedOrders.length - 1]]);
+  }
+}, []);
+useEffect(() => {
+  const timer = setTimeout(() => {
+    navigate("/menu");
+  }, 10000); // 10 sec tracking
+
+  return () => clearTimeout(timer);
 }, []);
   const getAddressFromCoords = async (lat, lng) => {
     try {
@@ -297,5 +307,24 @@ const btnSave = {
   fontWeight:"bold",
   cursor:"pointer"
 };
+const trackingCard = {
+  background: colors.card,
+  padding: "15px",
+  borderRadius: "12px",
+  marginTop: "10px"
+};
 
+const progressBar = {
+  height: "8px",
+  background: "#ddd",
+  borderRadius: "10px",
+  marginTop: "10px"
+};
+
+const progressFill = {
+  height: "100%",
+  width: "60%",
+  background: colors.primary,
+  borderRadius: "10px"
+};
 export default Delivery;

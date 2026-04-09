@@ -1,9 +1,14 @@
 export const colors = {
-  bg: "#faf7f2",          // main background
-  card: "#eadbc8",        // cards / containers
-  primary: "#588157",     // buttons
-  secondary: "#b08968",   // highlights
-  accent: "#a3b18a",      // soft accents
-  muted: "#848560",       // subtitles
-  text: "#2f2f2f"         // main text
+  bg: "#f6f0e6",
+  bgDeep: "#1f1611",
+  surface: "#fffaf4",
+  card: "#f3e4d0",
+  primary: "#8c5a36",
+  primaryDark: "#6d4528",
+  secondary: "#cfb083",
+  accent: "#254038",
+  muted: "#7d6d60",
+  border: "rgba(110, 75, 44, 0.18)",
+  text: "#201611",
+  success: "#2f6b4f"
 };

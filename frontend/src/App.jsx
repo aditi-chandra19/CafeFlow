@@ -21,167 +21,33 @@ import Bookings from "./pages/Bookings";
 import DiningHelp from "./pages/DiningHelp";
 import OrderSummary from "./pages/OrderSummary";
 import LiveTracking from "./pages/LiveTracking";
+import Explore from "./pages/Explore";
+
 function App() {
-  const cartItems = [
-  {
-    restaurantId: "1",
-    restaurantName: "Cafe Brew",
-    itemId: "101",
-    name: "Cold Coffee",
-    price: 120,
-    quantity: 1
-  },
-  {
-    restaurantId: "2",
-    restaurantName: "Sweet Treats",
-    itemId: "202",
-    name: "Chocolate Cake",
-    price: 200,
-    quantity: 1
-  },
-  {
-    restaurantId: "1",
-    restaurantName: "Cafe Brew",
-    itemId: "103",
-    name: "Sandwich",
-    price: 150,
-    quantity: 1
-  }
-];
   return (
     <BrowserRouter>
       <Routes>
-
-        {/* AUTH */}
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Explore />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/tracking" element={<LiveTracking />} />
         <Route path="/summary" element={<OrderSummary />} />
-        {/* MENU */}
-        <Route
-          path="/menu"
-          element={
-            <ProtectedRoute>
-              <Menu />
-            </ProtectedRoute>
-          }
-        />
 
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/delivery" element={<Delivery />} />
-
-        {/* RESTAURANT */}
-        <Route
-          path="/restaurant/:id"
-          element={
-            <ProtectedRoute>
-              <RestaurantMenu />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* FAVORITES */}
-        <Route path="/favorites" element={<Favorites />} />
-
-        {/* CART */}
-        <Route
-          path="/cart"
-          element={
-            <ProtectedRoute>
-              <Cart />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* CHECKOUT */}
-        <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          }
-        />
-           
-        {/* PAYMENT */}
-        <Route
-          path="/payment"
-          element={
-            <ProtectedRoute>
-              <Payment />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* SUCCESS */}
-        <Route
-          path="/success"
-          element={
-            <ProtectedRoute>
-              <OrderSuccess />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* ORDERS */}
-        <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <OrderHistory />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* BOOK TABLE */}
-        <Route
-          path="/book-table"
-          element={
-            <ProtectedRoute>
-              <BookTable />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* 🍽️ DINING FEATURES (FIXED POSITION) */}
-        <Route
-          path="/transactions"
-          element={
-            <ProtectedRoute>
-              <DiningTransactions />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/bookings"
-          element={
-            <ProtectedRoute>
-              <Bookings />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/help"
-          element={
-            <ProtectedRoute>
-              <DiningHelp />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* ADMIN */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute adminOnly={true}>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-
+        <Route path="/menu" element={<ProtectedRoute><Menu /></ProtectedRoute>} />
+        <Route path="/restaurant/:id" element={<ProtectedRoute><RestaurantMenu /></ProtectedRoute>} />
+        <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+        <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+        <Route path="/delivery" element={<ProtectedRoute><Delivery /></ProtectedRoute>} />
+        <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+        <Route path="/success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+        <Route path="/tracking" element={<ProtectedRoute><LiveTracking /></ProtectedRoute>} />
+        <Route path="/orders" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
+        <Route path="/book-table" element={<ProtectedRoute><BookTable /></ProtectedRoute>} />
+        <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/transactions" element={<ProtectedRoute><DiningTransactions /></ProtectedRoute>} />
+        <Route path="/bookings" element={<ProtectedRoute><Bookings /></ProtectedRoute>} />
+        <Route path="/help" element={<ProtectedRoute><DiningHelp /></ProtectedRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute adminOnly={true}><Dashboard /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

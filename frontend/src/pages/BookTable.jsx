@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BackButton, PageContainer, SurfacePanel } from "../components/ui/AppShell";
 import { colors } from "../theme";
 
 function BookTable() {
   const navigate = useNavigate();
-
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [guests, setGuests] = useState(1);
+  const [guests, setGuests] = useState(2);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
 
@@ -19,322 +19,288 @@ function BookTable() {
 
     const res = await fetch("http://localhost:5000/book-table", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        phone,
-        guests,
-        date,
-        time,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, guests, date, time }),
     });
 
     const data = await res.json();
-
     alert(data.message);
-
-    setTimeout(() => {
-      navigate("/menu");
-    }, 500);
+    setTimeout(() => navigate("/menu"), 500);
   };
 
   return (
-    <div className="page-shell" style={{ minHeight: "100vh", background: "transparent" }}>
+    <PageContainer maxWidth="1360px">
+      <BackButton onClick={() => navigate("/menu")} style={{ marginBottom: "18px" }}>
+        Back to dining
+      </BackButton>
+
       <div style={layout}>
-        <section className="glass-panel" style={showcasePanel}>
-          <div style={bookingGlow} />
-
-          <button onClick={() => navigate("/menu")} style={backBtn}>
-            Back to dining
-          </button>
-
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <p style={eyebrow}>Reservation studio</p>
-            <h1 style={heroHeading}>
-              Book your
-              <br />
-              signature evening.
-            </h1>
+        <section style={heroPanel}>
+          <div style={heroCard}>
+            <div style={heroBadge}>Reservation studio</div>
+            <h1 style={heroTitle}>Reserve your table with a more app-like booking flow.</h1>
             <p style={heroCopy}>
-              Designed for seamless arrivals, celebrated anniversaries, and
-              long conversations over beautifully plated courses.
+              Choose guests, date, and time in a simpler booking experience that feels faster,
+              clearer, and more modern.
             </p>
 
-            <div style={statsGrid}>
-              <div style={statCard}>
-                <span style={statLabel}>Guest experience</span>
-                <strong style={statValue}>4.9/5</strong>
+            <div style={infoGrid}>
+              <div style={infoTile}>
+                <span style={infoLabel}>Confirmation</span>
+                <strong style={infoValue}>Under 2 min</strong>
               </div>
-              <div style={statCard}>
-                <span style={statLabel}>Avg. confirmation</span>
-                <strong style={statValue}>Under 2 min</strong>
+              <div style={infoTile}>
+                <span style={infoLabel}>Best for</span>
+                <strong style={infoValue}>Date night and family dining</strong>
               </div>
-              <div style={statCard}>
-                <span style={statLabel}>Best for</span>
-                <strong style={statValue}>Date night</strong>
+              <div style={infoTile}>
+                <span style={infoLabel}>Experience</span>
+                <strong style={infoValue}>Quick and polished reservation flow</strong>
               </div>
             </div>
+          </div>
 
-            <div style={highlightPanel}>
-              <div style={highlightRow}>
-                <span style={highlightTitle}>Chef's note</span>
-                <span style={highlightCopy}>
-                  Request a candle-lit table or tasting counter in advance.
-                </span>
-              </div>
-              <div style={highlightRow}>
-                <span style={highlightTitle}>Member benefit</span>
-                <span style={highlightCopy}>
-                  Priority seating windows unlock during peak dinner hours.
-                </span>
-              </div>
+          <div style={notePanel}>
+            <div style={noteCard}>
+              <p className="muted-kicker">Good to know</p>
+              <strong style={noteTitle}>Peak dinner slots fill quickly.</strong>
+              <p style={noteCopy}>Book early if you want quieter seating or celebration-friendly timing.</p>
+            </div>
+            <div style={noteCardDark}>
+              <p className="muted-kicker" style={{ color: "rgba(255,255,255,0.64)" }}>Optional request</p>
+              <strong style={{ color: "white" }}>Add window seat or celebration notes after confirmation.</strong>
             </div>
           </div>
         </section>
 
-        <section className="glass-panel" style={formPanel}>
-          <div style={{ marginBottom: "22px" }}>
-            <p style={eyebrow}>Guest details</p>
-            <h2 style={{ fontSize: "2.6rem", color: colors.text }}>
-              Complete your booking
-            </h2>
+        <SurfacePanel style={formPanel}>
+          <div style={formHeader}>
+            <p className="muted-kicker">Guest details</p>
+            <h2 style={formTitle}>Complete your reservation</h2>
+            <p style={formCopy}>Fill in the booking details and confirm your preferred time slot.</p>
           </div>
 
-          <div style={fieldGroup}>
-            <label style={labelStyle}>Full name</label>
-            <input
-              className="luxury-input"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
+          <div style={formGrid}>
+            <label style={field}>
+              <span style={label}>Full name</span>
+              <input className="luxury-input" placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} />
+            </label>
 
-          <div style={fieldGroup}>
-            <label style={labelStyle}>Phone number</label>
-            <input
-              className="luxury-input"
-              placeholder="Phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
+            <label style={field}>
+              <span style={label}>Phone number</span>
+              <input className="luxury-input" placeholder="Enter phone number" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            </label>
 
-          <div style={twoCol}>
-            <div style={fieldGroup}>
-              <label style={labelStyle}>Guests</label>
-              <input
-                className="luxury-input"
-                type="number"
-                min="1"
-                value={guests}
-                onChange={(e) => setGuests(Number(e.target.value))}
-              />
+            <div style={doubleField}>
+              <label style={field}>
+                <span style={label}>Guests</span>
+                <input className="luxury-input" type="number" min="1" value={guests} onChange={(e) => setGuests(Number(e.target.value))} />
+              </label>
+
+              <label style={field}>
+                <span style={label}>Date</span>
+                <input className="luxury-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              </label>
             </div>
 
-            <div style={fieldGroup}>
-              <label style={labelStyle}>Date</label>
-              <input
-                className="luxury-input"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div style={fieldGroup}>
-            <label style={labelStyle}>Arrival time</label>
-            <input
-              className="luxury-input"
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-            />
+            <label style={field}>
+              <span style={label}>Arrival time</span>
+              <input className="luxury-input" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+            </label>
           </div>
 
           <div style={summaryCard}>
-            <strong style={{ display: "block", marginBottom: "6px" }}>
-              Reservation summary
-            </strong>
-            <span style={{ color: colors.muted }}>
-              {guests} guest{guests > 1 ? "s" : ""} • {date || "Select date"} • {time || "Select time"}
-            </span>
+            <span style={summaryLabel}>Reservation summary</span>
+            <strong style={summaryValue}>{guests} guest{guests > 1 ? "s" : ""} · {date || "Select date"} · {time || "Select time"}</strong>
           </div>
 
-          <button onClick={handleBooking} className="luxury-button" style={btnPrimary}>
+          <button onClick={handleBooking} className="luxury-button" style={primaryButton}>
             Confirm reservation
           </button>
-        </section>
+        </SurfacePanel>
       </div>
-    </div>
+    </PageContainer>
   );
 }
 
 const layout = {
-  maxWidth: "1280px",
-  margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "minmax(0, 1.1fr) minmax(340px, 0.8fr)",
+  gridTemplateColumns: "minmax(0, 1.08fr) minmax(360px, 0.92fr)",
   gap: "24px",
   alignItems: "stretch",
 };
 
-const showcasePanel = {
-  borderRadius: "34px",
-  padding: "clamp(24px, 4vw, 40px)",
-  overflow: "hidden",
-  position: "relative",
-  background:
-    "linear-gradient(180deg, rgba(255, 250, 244, 0.88) 0%, rgba(244, 232, 214, 0.82) 100%)",
+const heroPanel = {
+  display: "grid",
+  gap: "18px",
 };
 
-const formPanel = {
+const heroCard = {
   borderRadius: "34px",
-  padding: "clamp(22px, 4vw, 34px)",
-  background: "rgba(255, 250, 244, 0.94)",
+  padding: "32px",
+  minHeight: "420px",
+  background: "linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(255,244,238,0.96) 48%, rgba(191,78,59,0.14) 100%)",
+  border: `1px solid ${colors.border}`,
+  boxShadow: "0 24px 54px rgba(17, 24, 39, 0.10)",
 };
 
-const backBtn = {
-  marginBottom: "22px",
-  padding: "12px 18px",
-  background: "rgba(32, 22, 17, 0.92)",
-  color: "white",
-  border: "none",
+const heroBadge = {
+  display: "inline-flex",
+  padding: "9px 12px",
   borderRadius: "999px",
-  fontWeight: "700",
-  boxShadow: "0 14px 24px rgba(32, 22, 17, 0.16)",
-};
-
-const eyebrow = {
+  background: "rgba(191,78,59,0.1)",
+  color: colors.primaryDark,
+  fontSize: "11px",
   textTransform: "uppercase",
-  letterSpacing: "0.18em",
-  fontSize: "12px",
-  color: colors.muted,
-  marginBottom: "10px",
+  letterSpacing: "0.16em",
+  fontWeight: 800,
 };
 
-const heroHeading = {
-  fontSize: "clamp(3rem, 7vw, 5rem)",
-  color: colors.text,
+const heroTitle = {
+  marginTop: "18px",
+  fontSize: "clamp(3.2rem, 5vw, 5rem)",
   lineHeight: 0.92,
+  color: colors.text,
+  maxWidth: "660px",
 };
 
 const heroCopy = {
   marginTop: "18px",
+  maxWidth: "580px",
   color: colors.muted,
-  maxWidth: "620px",
   fontSize: "1.02rem",
 };
 
-const statsGrid = {
+const infoGrid = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
   gap: "14px",
   marginTop: "28px",
 };
 
-const statCard = {
+const infoTile = {
   padding: "18px",
   borderRadius: "22px",
-  background: "rgba(255, 255, 255, 0.52)",
+  background: "white",
   border: `1px solid ${colors.border}`,
-  display: "flex",
-  flexDirection: "column",
+  display: "grid",
   gap: "8px",
-  position: "relative",
-  zIndex: 1,
 };
 
-const statLabel = {
+const infoLabel = {
   color: colors.muted,
-  textTransform: "uppercase",
-  letterSpacing: "0.14em",
   fontSize: "11px",
-};
-
-const statValue = {
-  color: colors.text,
-  fontSize: "1.1rem",
-};
-
-const highlightPanel = {
-  marginTop: "26px",
-  borderRadius: "26px",
-  padding: "20px",
-  background: "rgba(32, 22, 17, 0.92)",
-  color: "#fff8f1",
-  display: "grid",
-  gap: "14px",
-  position: "relative",
-  zIndex: 1,
-};
-
-const highlightRow = {
-  display: "grid",
-  gap: "4px",
-};
-
-const highlightTitle = {
-  fontSize: "12px",
-  letterSpacing: "0.16em",
   textTransform: "uppercase",
-  color: "rgba(255, 248, 241, 0.68)",
+  letterSpacing: "0.16em",
+  fontWeight: 800,
 };
 
-const highlightCopy = {
-  color: "#fff8f1",
+const infoValue = {
+  color: colors.text,
+  fontSize: "1rem",
 };
 
-const fieldGroup = {
+const notePanel = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: "14px",
+};
+
+const noteCard = {
+  padding: "22px",
+  borderRadius: "26px",
+  background: colors.card,
+  border: `1px solid ${colors.border}`,
   display: "grid",
   gap: "8px",
-  marginBottom: "16px",
 };
 
-const labelStyle = {
+const noteCardDark = {
+  padding: "22px",
+  borderRadius: "26px",
+  background: "#111827",
+  display: "grid",
+  gap: "8px",
+};
+
+const noteTitle = {
   color: colors.text,
-  fontWeight: "700",
+  fontSize: "1.05rem",
+};
+
+const noteCopy = {
+  color: colors.muted,
+};
+
+const formPanel = {
+  padding: "30px",
+  borderRadius: "34px",
+  display: "grid",
+  gap: "22px",
+};
+
+const formHeader = {
+  display: "grid",
+  gap: "8px",
+};
+
+const formTitle = {
+  color: colors.text,
+  fontSize: "2.8rem",
+};
+
+const formCopy = {
+  color: colors.muted,
+};
+
+const formGrid = {
+  display: "grid",
+  gap: "16px",
+};
+
+const field = {
+  display: "grid",
+  gap: "8px",
+};
+
+const label = {
+  color: colors.text,
+  fontWeight: 700,
   fontSize: "14px",
 };
 
-const twoCol = {
+const doubleField = {
   display: "grid",
   gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
   gap: "14px",
 };
 
 const summaryCard = {
-  marginTop: "22px",
-  padding: "16px 18px",
-  borderRadius: "20px",
-  background: "rgba(207, 176, 131, 0.18)",
-  color: colors.text,
+  padding: "18px 20px",
+  borderRadius: "22px",
+  background: "rgba(197,138,44,0.12)",
   border: `1px solid ${colors.border}`,
+  display: "grid",
+  gap: "8px",
 };
 
-const btnPrimary = {
+const summaryLabel = {
+  color: colors.muted,
+  fontSize: "11px",
+  textTransform: "uppercase",
+  letterSpacing: "0.16em",
+  fontWeight: 800,
+};
+
+const summaryValue = {
+  color: colors.text,
+  fontSize: "1rem",
+};
+
+const primaryButton = {
   width: "100%",
-  padding: "16px",
-  marginTop: "22px",
-  background: colors.primary,
+  background: "linear-gradient(135deg, #bf4e3b, #c58a2c)",
   color: "white",
-  border: "none",
-  borderRadius: "999px",
-  fontSize: "15px",
-  fontWeight: "700",
-  boxShadow: "0 18px 36px rgba(140, 90, 54, 0.28)",
-};
-
-const bookingGlow = {
-  position: "absolute",
-  width: "320px",
-  height: "320px",
-  right: "-80px",
-  top: "-110px",
-  background: "radial-gradient(circle, rgba(207,176,131,0.5), transparent 70%)",
 };
 
 export default BookTable;

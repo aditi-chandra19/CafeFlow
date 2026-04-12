@@ -2,329 +2,134 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { colors } from "../theme";
 import Toolbar from "../components/Toolbar";
+import {
+  getAddresses,
+  getDeliveryDetails,
+  setAddresses,
+  setDeliveryDetails,
+} from "../lib/storage";
+import {
+  BackButton,
+  PageContainer,
+  PageHeading,
+  SplitLayout,
+  SurfacePanel,
+} from "../components/ui/AppShell";
+
 function Delivery() {
   const navigate = useNavigate();
-  const [name,setName] = useState("");
-  const [phone,setPhone] = useState("");
-  const [address,setAddress] = useState("");
-  const [city,setCity] = useState("");
-  const [pincode,setPincode] = useState("");
-  const [lat,setLat] = useState(null);
-  const [lng,setLng] = useState(null);
-  const [savedAddress,setSavedAddress] = useState([]);
-  const [loadingLocation,setLoadingLocation] = useState(false);
-  const [orders, setOrders] = useState([]);
-  useEffect(()=>{
-    const saved = JSON.parse(localStorage.getItem("addresses")) || [];
-    setSavedAddress(saved);
-  },[]);
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    city: "",
+    pincode: "",
+    lat: 12.9716,
+    lng: 77.5946,
+  });
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [loadingLocation, setLoadingLocation] = useState(false);
+
   useEffect(() => {
-  const savedOrders =
-    JSON.parse(localStorage.getItem("orderHistory")) || [];
+    setSavedAddresses(getAddresses());
+    const existing = getDeliveryDetails();
+    if (existing) setForm((prev) => ({ ...prev, ...existing }));
+  }, []);
 
-  if (savedOrders.length > 0) {
-    // ✅ Only latest order
-    setOrders([savedOrders[savedOrders.length - 1]]);
-  }
-}, []);
-useEffect(() => {
-  const timer = setTimeout(() => {
-    navigate("/menu");
-  }, 10000); // 10 sec tracking
-
-  return () => clearTimeout(timer);
-}, []);
-  const getAddressFromCoords = async (lat, lng) => {
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-      );
-
-      const data = await res.json();
-      const addr = data.address || {};
-
-      setCity(addr.city || addr.town || addr.village || "");
-      setPincode(addr.postcode || "");
-      setAddress(data.display_name || "");
-
-    } catch (err) {
-      console.log("Error:", err);
-    }
+  const handleChange = (event) => {
+    setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
   };
 
   const getLocation = () => {
-
     if (!navigator.geolocation) {
-      alert("Geolocation not supported ❗");
+      alert("Geolocation not supported");
       return;
     }
 
     setLoadingLocation(true);
-
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
-
-        setLat(latitude);
-        setLng(longitude);
-
-        await getAddressFromCoords(latitude, longitude);
-
+        setForm((prev) => ({ ...prev, lat: latitude, lng: longitude }));
         setLoadingLocation(false);
-
       },
       () => {
-        alert("Location permission denied ❗");
         setLoadingLocation(false);
+        alert("Location permission denied");
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };
 
   const saveAddress = () => {
-
-    if(!name || !phone || !address || !city || !pincode){
-      alert("Please fill all fields ❗");
+    if (!form.name || !form.phone || !form.address || !form.city || !form.pincode) {
+      alert("Please fill all delivery details");
       return;
     }
 
-    if(pincode.length !== 6){
-      alert("Enter valid pincode ❗");
-      return;
-    }
-
-    const newAddress = {
-      name,
-      phone,
-      address,
-      city,
-      pincode
-    };
-
-    const existing =
-      JSON.parse(localStorage.getItem("addresses")) || [];
-
-    const updated = [...existing, newAddress];
-
-    localStorage.setItem("addresses", JSON.stringify(updated));
-    localStorage.setItem("deliveryDetails", JSON.stringify(newAddress));
-
+    const updated = [
+      form,
+      ...savedAddresses.filter((item) => item.address !== form.address),
+    ].slice(0, 4);
+    setAddresses(updated);
+    setDeliveryDetails(form);
     navigate("/payment");
   };
 
-  return(
+  return (
     <>
-    <Toolbar/>
+      <Toolbar />
+      <PageContainer maxWidth="1100px">
+        <SplitLayout>
+          <SurfacePanel>
+            <PageHeading
+              title="Delivery details"
+              subtitle="Choose your active delivery address before continuing to payment."
+            />
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "20px" }}>
+              <BackButton onClick={() => navigate(-1)}>Back</BackButton>
+              <button className="luxury-button" style={primaryBtn} onClick={getLocation}>{loadingLocation ? "Detecting..." : "Use my location"}</button>
+            </div>
 
-    <div style={{
-      minHeight:"100vh",
-      background: colors.bg,
-      padding:"40px"
-    }}>
-
-      <div style={{
-        maxWidth:"600px",
-        margin:"auto",
-        background: colors.card,
-        padding:"30px",
-        borderRadius:"20px",
-        boxShadow:"0 10px 25px rgba(0,0,0,0.05)"
-      }}>
-
-        <h1 style={{color: colors.text}}>Delivery Address </h1>
-
-        <div style={{ display:"flex", gap:"12px", marginBottom:"15px" }}>
-
-          <button onClick={() => navigate("/menu")} style={btnBack}>
-            ← Back
-          </button>
-
-          <button onClick={getLocation} style={btnLocation}>
-             Detect My Location
-          </button>
-
-        </div>
-
-        {loadingLocation && (
-          <p style={{color: colors.muted}}>Detecting location...</p>
-        )}
-
-        {lat && lng && (
-          <div style={locationBox}>
-            📍 Location detected
-          </div>
-        )}
-
-        <p style={{color: colors.muted, fontSize:"13px"}}>
-          Please verify your address before saving
-        </p>
-
-        {savedAddress.length > 0 && (
-          <div style={{marginBottom:"20px"}}>
-
-            <h3 style={{color: colors.text}}>Saved Addresses </h3>
-
-            {savedAddress.map((addr,index)=>(
-
-              <div key={index} style={card}>
-
-                <button
-                  onClick={() => {
-                    const updated = savedAddress.filter((_, i) => i !== index);
-                    setSavedAddress(updated);
-                    localStorage.setItem("addresses", JSON.stringify(updated));
-                  }}
-                  style={deleteBtn}
-                >
-                  ✖
-                </button>
-
-                <p><strong>{addr.name}</strong></p>
-                <p style={{color: colors.muted}}>{addr.phone}</p>
-                <p style={{color: colors.text}}>{addr.address}</p>
-                <p style={{color: colors.muted}}>
-                  {addr.city} - {addr.pincode}
-                </p>
-
-                <button
-                  onClick={()=>{
-                    setName(addr.name);
-                    setPhone(addr.phone);
-                    setAddress(addr.address);
-                    setCity(addr.city);
-                    setPincode(addr.pincode);
-
-                    localStorage.setItem("deliveryDetails", JSON.stringify(addr));
-                  }}
-                  style={btnUse}
-                >
-                  Use This Address
-                </button>
-
+            <div style={{ marginTop: "20px", display: "grid", gap: "14px" }}>
+              <input className="luxury-input" name="name" placeholder="Full name" value={form.name} onChange={handleChange} />
+              <input className="luxury-input" name="phone" placeholder="Phone number" value={form.phone} onChange={handleChange} />
+              <input className="luxury-input" name="address" placeholder="Address" value={form.address} onChange={handleChange} />
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "12px" }}>
+                <input className="luxury-input" name="city" placeholder="City" value={form.city} onChange={handleChange} />
+                <input className="luxury-input" name="pincode" placeholder="Pincode" value={form.pincode} onChange={handleChange} />
               </div>
+            </div>
 
-            ))}
-          </div>
-        )}
+            <button className="luxury-button" style={{ ...primaryBtn, width: "100%", marginTop: "18px" }} onClick={saveAddress}>Save and continue to payment</button>
+          </SurfacePanel>
 
-        <input placeholder="Full Name" value={name} onChange={(e)=>setName(e.target.value)} style={inputStyle}/>
-        <input placeholder="Phone Number" value={phone} onChange={(e)=>setPhone(e.target.value)} style={inputStyle}/>
-        <input placeholder="Address" value={address} onChange={(e)=>setAddress(e.target.value)} style={inputStyle}/>
-        <input placeholder="City" value={city} onChange={(e)=>setCity(e.target.value)} style={inputStyle}/>
-        <input placeholder="Pincode" value={pincode} onChange={(e)=>setPincode(e.target.value)} style={inputStyle}/>
-
-        <button onClick={saveAddress} style={btnSave}>
-          Save & Continue to Payment
-        </button>
-
-      </div>
-    </div>
+          <SurfacePanel>
+            <h2 style={{ fontSize: "2.2rem", color: colors.text }}>Saved addresses</h2>
+            <div style={{ marginTop: "16px", display: "grid", gap: "12px" }}>
+              {savedAddresses.length ? savedAddresses.map((address, index) => (
+                <div key={`${address.address}-${index}`} style={addressCard}>
+                  <strong>{address.name}</strong>
+                  <p style={{ color: colors.muted }}>{address.phone}</p>
+                  <p>{address.address}</p>
+                  <p style={{ color: colors.muted }}>{address.city} - {address.pincode}</p>
+                  <button className="luxury-button" style={secondaryBtn} onClick={() => {
+                    setForm(address);
+                    setDeliveryDetails(address);
+                  }}>Use this address</button>
+                </div>
+              )) : <p style={{ color: colors.muted }}>No saved addresses yet.</p>}
+            </div>
+          </SurfacePanel>
+        </SplitLayout>
+      </PageContainer>
     </>
   );
 }
 
-/* STYLES */
+const primaryBtn = { background: colors.primary, color: "white" };
+const secondaryBtn = { background: colors.card, color: colors.text };
+const addressCard = { display: "grid", gap: "6px", padding: "16px", borderRadius: "18px", background: colors.card, border: `1px solid ${colors.border}` };
 
-const inputStyle = {
-  display:"block",
-  width:"100%",
-  padding:"12px",
-  marginTop:"12px",
-  borderRadius:"8px",
-  border:"1px solid #d6ccc2"
-};
-
-const btnBack = {
-  padding:"8px 16px",
-  background: colors.primary,
-  color:"white",
-  border:"none",
-  borderRadius:"8px",
-  cursor:"pointer"
-};
-
-const btnLocation = {
-  padding:"8px 16px",
-  background: colors.secondary,
-  color:"white",
-  border:"none",
-  borderRadius:"8px",
-  cursor:"pointer"
-};
-
-const locationBox = {
-  background: colors.accent,
-  padding:"10px",
-  borderRadius:"8px",
-  marginBottom:"15px",
-  color:"#fff"
-};
-
-const card = {
-  background: colors.bg,
-  padding:"15px",
-  borderRadius:"10px",
-  marginTop:"10px",
-  border:"1px solid #e2e8f0",
-  position:"relative"
-};
-
-const deleteBtn = {
-  position:"absolute",
-  top:"10px",
-  right:"10px",
-  border:"none",
-  background:"transparent",
-  cursor:"pointer",
-  fontSize:"16px",
-  color: colors.muted
-};
-
-const btnUse = {
-  marginTop:"8px",
-  padding:"6px 12px",
-  background: colors.primary,
-  color:"white",
-  border:"none",
-  borderRadius:"6px",
-  cursor:"pointer"
-};
-
-const btnSave = {
-  marginTop:"15px",
-  width:"100%",
-  padding:"12px",
-  border:"none",
-  borderRadius:"10px",
-  background: colors.primary,
-  color:"white",
-  fontWeight:"bold",
-  cursor:"pointer"
-};
-const trackingCard = {
-  background: colors.card,
-  padding: "15px",
-  borderRadius: "12px",
-  marginTop: "10px"
-};
-
-const progressBar = {
-  height: "8px",
-  background: "#ddd",
-  borderRadius: "10px",
-  marginTop: "10px"
-};
-
-const progressFill = {
-  height: "100%",
-  width: "60%",
-  background: colors.primary,
-  borderRadius: "10px"
-};
 export default Delivery;

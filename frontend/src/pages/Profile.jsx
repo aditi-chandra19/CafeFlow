@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Toolbar from "../components/Toolbar";
+import { colors } from "../theme";
+import { getUserProfile, setUserProfile } from "../lib/storage";
+import {
+  BackButton,
+  PageContainer,
+  PageHeading,
+  SurfacePanel,
+} from "../components/ui/AppShell";
 
 function Profile() {
-
   const navigate = useNavigate();
-
-  const storedUser = JSON.parse(localStorage.getItem("user")) || {};
-
+  const storedUser = getUserProfile();
   const [name, setName] = useState(storedUser.name || "");
   const [phone, setPhone] = useState(storedUser.phone || "");
   const [email, setEmail] = useState(storedUser.email || "");
@@ -15,121 +20,37 @@ function Profile() {
   const [gender, setGender] = useState(storedUser.gender || "");
 
   const saveProfile = () => {
-
-    const updatedUser = {
-      name,
-      phone,
-      email,
-      dob,
-      gender
-    };
-
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-
-    alert("Profile Updated ✅");
+    setUserProfile({ name, phone, email, dob, gender });
+    alert("Profile updated");
   };
 
   return (
     <>
       <Toolbar />
-
-      <div style={container}>
-
-  {/* BACK BUTTON */}
-  <button style={backBtn} onClick={() => navigate(-1)}>
-    ← Back
-  </button>
-
-  <h2 style={{marginBottom:"20px"}}>Your Profile</h2>
-      
-        <input
-          placeholder="Name"
-          value={name}
-          onChange={(e)=>setName(e.target.value)}
-          style={input}
-        />
-
-        <input
-          placeholder="Mobile"
-          value={phone}
-          onChange={(e)=>setPhone(e.target.value)}
-          style={input}
-        />
-
-        <input
-          placeholder="Email"
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
-          style={input}
-        />
-
-        <input
-          type="date"
-          value={dob}
-          onChange={(e)=>setDob(e.target.value)}
-          style={input}
-        />
-
-        <select
-          value={gender}
-          onChange={(e)=>setGender(e.target.value)}
-          style={input}
-        >
-          <option value="">Select Gender</option>
-          <option>Male</option>
-          <option>Female</option>
-          <option>Other</option>
-        </select>
-
-        <button onClick={saveProfile} style={saveBtn}>
-          Update Profile
-        </button>
-
-      </div>
+      <PageContainer maxWidth="560px">
+        <SurfacePanel style={container}>
+          <BackButton onClick={() => navigate(-1)} style={backBtn}>Back</BackButton>
+          <div style={{ marginTop: "14px" }}>
+            <PageHeading title="Your profile" />
+          </div>
+          <div style={{ marginTop: "20px", display: "grid", gap: "14px" }}>
+            <input className="luxury-input" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+            <input className="luxury-input" placeholder="Mobile" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <input className="luxury-input" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input className="luxury-input" type="date" value={dob} onChange={(e) => setDob(e.target.value)} />
+            <select className="luxury-select" value={gender} onChange={(e) => setGender(e.target.value)}>
+              <option value="">Select Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <button className="luxury-button" style={{ ...backBtn, width: "100%", marginTop: "18px" }} onClick={saveProfile}>Update profile</button>
+        </SurfacePanel>
+      </PageContainer>
     </>
   );
 }
-
-/* STYLES */
-const backBtn = {
-  background: "#588157",       // green
-  color: "white",
-  border: "none",
-  padding: "10px 18px",
-  borderRadius: "12px",        // rounded corners
-  cursor: "pointer",
-  fontSize: "14px",
-  fontWeight: "500",
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "6px",
-};
-const container = {
-  maxWidth:"500px",
-  margin:"auto",
-  padding:"30px",
-  background:"#faf7f2",
-  borderRadius:"12px",
-  marginTop:"20px"
-};
-
-const input = {
-  width:"100%",
-  padding:"12px",
-  marginBottom:"15px",
-  borderRadius:"10px",
-  border:"1px solid #ccc"
-};
-
-const saveBtn = {
-  width:"100%",
-  padding:"12px",
-  background:"#588157",
-  color:"white",
-  border:"none",
-  borderRadius:"10px",
-  cursor:"pointer",
-  fontWeight:"bold"
-};
-
+const container = { maxWidth: "560px", margin: "0 auto", borderRadius: "30px", padding: "24px" };
+const backBtn = { background: colors.primary, color: "white" };
 export default Profile;

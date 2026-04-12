@@ -1,118 +1,41 @@
 import { useNavigate } from "react-router-dom";
 import Toolbar from "../components/Toolbar";
+import { colors } from "../theme";
 
 function DiningTransactions() {
-
   const navigate = useNavigate();
-
   const transactions = [
-    {
-      name: "Cafe Mocha",
-      date: "20 March 2026",
-      amount: 450
-    },
-    {
-      name: "Green Bowl",
-      date: "18 March 2026",
-      amount: 320
-    }
+    { name: "Royal Tandoor House", date: "20 April 2026", amount: 850 },
+    { name: "Bombay Chat Room", date: "18 April 2026", amount: 420 },
   ];
 
   return (
     <>
       <Toolbar />
-
-      <div style={page}>
-
-        <button onClick={() => navigate(-1)} style={backBtn}>
-          ← Back
-        </button>
-
-        <h1 style={title}>Dining Transactions</h1>
-
-        {transactions.map((t, index) => (
-          <div key={index} style={card}>
-
-            <div style={topRow}>
-              <h2 style={restaurant}>{t.name}</h2>
-              <span style={status}>Completed</span>
-            </div>
-
-            <p style={date}>{t.date}</p>
-
-            <div style={bottomRow}>
-              <span style={amount}>₹ {t.amount}</span>
-            </div>
-
+      <div className="page-shell">
+        <div style={{ maxWidth: "860px", margin: "0 auto" }}>
+          <button className="luxury-button" style={backBtn} onClick={() => navigate(-1)}>Back</button>
+          <h1 style={{ fontSize: "3rem", color: colors.text, marginTop: "14px" }}>Dining transactions</h1>
+          <div style={{ marginTop: "20px", display: "grid", gap: "14px" }}>
+            {transactions.map((transaction) => (
+              <div key={`${transaction.name}-${transaction.date}`} className="glass-panel" style={card}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center" }}>
+                  <div>
+                    <h3 style={{ fontSize: "2rem", color: colors.text }}>{transaction.name}</h3>
+                    <p style={{ color: colors.muted }}>{transaction.date}</p>
+                  </div>
+                  <span style={status}>Completed</span>
+                </div>
+                <strong style={{ display: "block", marginTop: "12px", color: colors.text }}>Rs {transaction.amount}</strong>
+              </div>
+            ))}
           </div>
-        ))}
-
+        </div>
       </div>
     </>
   );
 }
-
-/* STYLES */
-
-const page = {
-  minHeight: "100vh",
-  background: "#FAF7F2",
-  padding: "40px 20px"
-};
-
-const title = {
-  marginBottom: "20px",
-  color: "#2F2F2F"
-};
-
-const card = {
-  background: "#EADBC8",
-  padding: "20px",
-  borderRadius: "15px",
-  marginBottom: "20px",
-  boxShadow: "0 4px 10px rgba(0,0,0,0.05)"
-};
-
-const topRow = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center"
-};
-
-const restaurant = {
-  margin: 0
-};
-
-const date = {
-  marginTop: "5px",
-  color: "#555"
-};
-
-const bottomRow = {
-  marginTop: "10px"
-};
-
-const amount = {
-  fontWeight: "bold",
-  fontSize: "18px"
-};
-
-const status = {
-  background: "#A3B18A",
-  color: "white",
-  padding: "5px 10px",
-  borderRadius: "20px",
-  fontSize: "12px"
-};
-
-const backBtn = {
-  marginBottom: "20px",
-  padding: "8px 16px",
-  background: "#588157",
-  color: "white",
-  border: "none",
-  borderRadius: "8px",
-  cursor: "pointer"
-};
-
+const backBtn = { background: colors.primary, color: "white" };
+const card = { borderRadius: "24px", padding: "20px" };
+const status = { padding: "8px 12px", borderRadius: "999px", background: "rgba(21,128,61,0.12)", color: colors.success, fontWeight: 700 };
 export default DiningTransactions;

@@ -13,128 +13,90 @@ function Toolbar() {
 
   return (
     <>
-      <div style={toolbar}>
-        <div style={left}>
-          <span style={logo} onClick={() => navigate("/menu")}>
-            CafeFlow
-          </span>
+      <header style={toolbarWrap}>
+        <div style={toolbar}>
+          <button type="button" style={brandButton} onClick={() => navigate("/menu")}>
+            <span style={brandDot} />
+            <span style={brandText}>CafeFlow</span>
+          </button>
 
-          <span
-            style={{ ...location, cursor: "pointer" }}
-            onClick={() => setShowAddress(!showAddress)}
-          >
-            <span style={locationBadge}>Now serving</span>
-            {address?.city || "Set Location"}
-          </span>
-        </div>
-
-        <div style={centerMeta}>
-          <div style={metaPill}>Chef-curated dining</div>
-          <div style={metaPill}>Priority reservations</div>
-        </div>
-
-        <div style={right}>
-          <div style={welcomeBlock}>
-            <span style={welcomeEyebrow}>Member lounge</span>
-            <strong style={welcomeName}>{user.name}</strong>
-          </div>
-
-          <div style={{ position: "relative" }}>
-            <button onClick={() => setOpenMenu(!openMenu)} style={menuBtn}>
-              Menu
+          <div style={centerRow}>
+            <button type="button" style={locationChip} onClick={() => setShowAddress((prev) => !prev)}>
+              <span style={chipLabel}>Location</span>
+              <strong>{address?.city || "Set delivery area"}</strong>
             </button>
+            <div style={utilityChip}>Dining + delivery</div>
+            <div style={utilityChip}>Live tracking</div>
+          </div>
 
-            {openMenu && (
-              <div style={dropdown}>
-                <div style={menuItem} onClick={() => navigate("/profile")}>
-                  <span style={icon}>Profile</span>
-                  <span>Profile</span>
+          <div style={rightRow}>
+            <div style={accountPill}>
+              <span style={chipLabel}>Account</span>
+              <strong>{user.name}</strong>
+            </div>
+
+            <div style={{ position: "relative" }}>
+              <button type="button" style={menuButton} onClick={() => setOpenMenu((prev) => !prev)}>
+                Menu
+              </button>
+
+              {openMenu && (
+                <div className="spotlight-card" style={dropdown}>
+                  <button type="button" style={dropdownItem} onClick={() => navigate("/profile")}>Profile</button>
+                  <button type="button" style={dropdownItem} onClick={() => navigate("/favorites")}>Favorites</button>
+                  <button type="button" style={dropdownItem} onClick={() => navigate("/orders")}>Orders</button>
+                  <button type="button" style={dropdownItem} onClick={() => navigate("/transactions")}>Transactions</button>
+                  <button type="button" style={dropdownItem} onClick={() => navigate("/bookings")}>Bookings</button>
+                  <button type="button" style={dropdownItem} onClick={() => navigate("/help")}>Support</button>
+                  <div style={divider} />
+                  <button
+                    type="button"
+                    style={{ ...dropdownItem, color: "#b42318" }}
+                    onClick={() => {
+                      localStorage.clear();
+                      navigate("/login");
+                    }}
+                  >
+                    Logout
+                  </button>
                 </div>
-
-                <div style={menuItem} onClick={() => navigate("/favorites")}>
-                  <span style={icon}>Saved</span>
-                  <span>Favorites</span>
-                </div>
-
-                <div style={menuItem} onClick={() => navigate("/orders")}>
-                  <span style={icon}>Orders</span>
-                  <span>Order Summary</span>
-                </div>
-
-                <div
-                  style={menuItem}
-                  onClick={() => {
-                    navigator.clipboard.writeText("Join CafeFlow");
-                    alert("Invite link copied!");
-                  }}
-                >
-                  <span style={icon}>Share</span>
-                  <span>Invite your friends</span>
-                </div>
-
-                <hr style={divider} />
-
-                <div style={sectionTitle}>Your Experiences</div>
-
-                <div style={item} onClick={() => navigate("/transactions")}>
-                  Dining Transactions
-                </div>
-
-                <div style={item} onClick={() => navigate("/bookings")}>
-                  Your Bookings
-                </div>
-
-                <div style={item} onClick={() => navigate("/help")}>
-                  Dining Help
-                </div>
-
-                <hr style={divider} />
-
-                <div
-                  style={{ ...item, color: "#b91c1c", fontWeight: "bold" }}
-                  onClick={() => {
-                    localStorage.clear();
-                    navigate("/login");
-                  }}
-                >
-                  Logout
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
       {showAddress && (
-        <div style={addressBox}>
-          <h4 style={{ marginBottom: "12px", fontSize: "1.4rem" }}>Saved Addresses</h4>
+        <div className="spotlight-card" style={addressBox}>
+          <div>
+            <p className="muted-kicker">Saved addresses</p>
+            <h4 style={addressTitle}>Choose a delivery point</h4>
+          </div>
 
           {savedAddresses.length ? (
-            savedAddresses.map((addr, i) => (
-              <div key={i} style={addressItem}>
-                <p>
-                  <strong>{addr.name}</strong>
-                </p>
-                <p>{addr.address}</p>
-                <p>
-                  {addr.city} - {addr.pincode}
-                </p>
-
+            savedAddresses.map((addr, index) => (
+              <div key={index} style={addressCard}>
+                <div>
+                  <strong style={{ color: colors.text }}>{addr.name}</strong>
+                  <p style={addressText}>{addr.address}</p>
+                  <p style={addressText}>{addr.city} - {addr.pincode}</p>
+                </div>
                 <button
+                  type="button"
+                  style={useButton}
                   onClick={() => {
                     localStorage.setItem("deliveryDetails", JSON.stringify(addr));
                     setShowAddress(false);
                     window.location.reload();
                   }}
-                  style={useBtn}
                 >
-                  Use
+                  Use address
                 </button>
               </div>
             ))
           ) : (
             <p style={{ color: colors.muted }}>
-              No saved address yet. Add one from delivery to personalize bookings.
+              No saved addresses yet. Add one during delivery to personalize the app.
             </p>
           )}
         </div>
@@ -143,199 +105,196 @@ function Toolbar() {
   );
 }
 
-const toolbar = {
-  width: "100%",
-  padding: "18px 22px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
+const toolbarWrap = {
   position: "sticky",
   top: 0,
   zIndex: 3000,
-  borderBottom: `1px solid ${colors.border}`,
-  backgroundColor: "rgba(250, 242, 230, 0.74)",
-  backdropFilter: "blur(18px)",
-  WebkitBackdropFilter: "blur(18px)",
-  gap: "16px",
-  flexWrap: "wrap",
+  padding: "18px 24px 0",
 };
 
-const left = {
+const toolbar = {
+  maxWidth: "1440px",
+  margin: "0 auto",
+  background: "rgba(17, 24, 39, 0.88)",
+  color: "white",
+  borderRadius: "24px",
+  padding: "14px 18px",
   display: "flex",
+  justifyContent: "space-between",
   alignItems: "center",
   gap: "14px",
   flexWrap: "wrap",
+  boxShadow: "0 22px 54px rgba(17, 24, 39, 0.18)",
 };
 
-const centerMeta = {
-  display: "flex",
-  gap: "10px",
-  flexWrap: "wrap",
-  justifyContent: "center",
-  flex: 1,
-  minWidth: "220px",
-};
-
-const right = {
+const brandButton = {
   display: "flex",
   alignItems: "center",
   gap: "12px",
+  border: "none",
+  background: "transparent",
+  color: "white",
+  minHeight: "auto",
+  padding: 0,
+  boxShadow: "none",
 };
 
-const logo = {
-  fontFamily: '"Cormorant Garamond", serif',
-  fontWeight: "700",
-  fontSize: "2rem",
-  cursor: "pointer",
-  color: colors.text,
+const brandDot = {
+  width: "14px",
+  height: "14px",
+  borderRadius: "50%",
+  background: "linear-gradient(135deg, #bf4e3b, #c58a2c)",
+  boxShadow: "0 0 0 6px rgba(191,78,59,0.12)",
 };
 
-const location = {
-  fontSize: "14px",
-  color: colors.text,
+const brandText = {
+  fontFamily: '"Outfit", sans-serif',
+  fontWeight: 800,
+  fontSize: "1.55rem",
+  letterSpacing: "-0.04em",
+};
+
+const centerRow = {
   display: "flex",
   alignItems: "center",
   gap: "10px",
-  padding: "8px 14px",
-  borderRadius: "999px",
-  background: "rgba(255, 250, 244, 0.78)",
-  border: `1px solid ${colors.border}`,
+  flexWrap: "wrap",
+  flex: 1,
+  justifyContent: "center",
 };
 
-const locationBadge = {
-  padding: "4px 8px",
-  borderRadius: "999px",
-  background: colors.text,
-  color: "#fffaf4",
-  fontSize: "11px",
-  letterSpacing: "0.08em",
+const chipLabel = {
+  fontSize: "10px",
   textTransform: "uppercase",
+  letterSpacing: "0.16em",
+  color: "rgba(255,255,255,0.62)",
+  fontWeight: 800,
 };
 
-const metaPill = {
-  padding: "8px 12px",
-  borderRadius: "999px",
-  border: `1px solid ${colors.border}`,
-  background: "rgba(255, 250, 244, 0.65)",
-  color: colors.muted,
-  fontSize: "12px",
-  textTransform: "uppercase",
-  letterSpacing: "0.12em",
+const locationChip = {
+  border: "1px solid rgba(255,255,255,0.12)",
+  background: "rgba(255,255,255,0.08)",
+  color: "white",
+  borderRadius: "16px",
+  padding: "10px 14px",
+  minHeight: "auto",
+  display: "grid",
+  gap: "2px",
+  textAlign: "left",
+  boxShadow: "none",
 };
 
-const welcomeBlock = {
+const utilityChip = {
+  padding: "11px 14px",
+  borderRadius: "16px",
+  background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  color: "rgba(255,255,255,0.88)",
+  fontWeight: 600,
+  fontSize: "0.9rem",
+};
+
+const rightRow = {
   display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-end",
-  lineHeight: 1.1,
+  alignItems: "center",
+  gap: "10px",
 };
 
-const welcomeEyebrow = {
-  fontSize: "11px",
-  textTransform: "uppercase",
-  letterSpacing: "0.18em",
-  color: colors.muted,
+const accountPill = {
+  padding: "10px 14px",
+  borderRadius: "16px",
+  background: "rgba(255,255,255,0.08)",
+  display: "grid",
+  gap: "2px",
+  minWidth: "120px",
 };
 
-const welcomeName = {
-  color: colors.text,
-  fontSize: "14px",
-};
-
-const menuBtn = {
-  fontSize: "14px",
-  background: colors.text,
-  color: "#fffaf4",
+const menuButton = {
+  background: "linear-gradient(135deg, #bf4e3b, #c58a2c)",
+  color: "white",
   border: "none",
-  borderRadius: "999px",
-  padding: "12px 18px",
-  fontWeight: "700",
-  boxShadow: "0 14px 30px rgba(32, 22, 17, 0.18)",
+  borderRadius: "16px",
+  padding: "12px 16px",
+  fontWeight: 800,
 };
 
 const dropdown = {
   position: "absolute",
   right: 0,
-  top: "62px",
-  background: "rgba(255, 250, 244, 0.95)",
+  top: "58px",
+  width: "240px",
+  padding: "10px",
   borderRadius: "22px",
-  padding: "14px",
-  width: "260px",
-  zIndex: 2000,
+  background: "rgba(255,255,255,0.98)",
   border: `1px solid ${colors.border}`,
-  boxShadow: "0 22px 50px rgba(34, 22, 14, 0.18)",
+  boxShadow: "0 24px 56px rgba(17, 24, 39, 0.18)",
+  zIndex: 3001,
+  display: "grid",
+  gap: "4px",
 };
 
-const menuItem = {
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-  padding: "12px 10px",
-  cursor: "pointer",
-  borderRadius: "14px",
+const dropdownItem = {
+  border: "none",
+  background: "transparent",
+  textAlign: "left",
   color: colors.text,
-};
-
-const icon = {
-  minWidth: "56px",
-  display: "flex",
-  justifyContent: "center",
-  color: colors.muted,
-  fontSize: "12px",
-  textTransform: "uppercase",
-  letterSpacing: "0.08em",
-};
-
-const item = {
-  padding: "12px",
-  cursor: "pointer",
+  padding: "12px 12px",
   borderRadius: "14px",
-  color: colors.text,
+  minHeight: "auto",
+  boxShadow: "none",
+  fontWeight: 600,
 };
 
 const divider = {
-  margin: "10px 0",
-  border: "none",
-  borderTop: `1px solid ${colors.border}`,
-};
-
-const sectionTitle = {
-  fontSize: "12px",
-  color: colors.muted,
-  padding: "6px 10px",
-  textTransform: "uppercase",
-  letterSpacing: "0.16em",
+  height: "1px",
+  background: colors.border,
+  margin: "6px 2px",
 };
 
 const addressBox = {
   position: "absolute",
-  top: "86px",
+  top: "92px",
   left: "24px",
-  background: "rgba(255, 250, 244, 0.96)",
+  width: "340px",
   padding: "18px",
-  borderRadius: "20px",
-  width: "290px",
-  zIndex: 2000,
+  borderRadius: "24px",
+  background: "rgba(255,255,255,0.98)",
   border: `1px solid ${colors.border}`,
-  boxShadow: "0 18px 44px rgba(41, 26, 16, 0.14)",
+  boxShadow: "0 24px 56px rgba(17, 24, 39, 0.15)",
+  zIndex: 3001,
+  display: "grid",
+  gap: "12px",
 };
 
-const addressItem = {
-  marginBottom: "10px",
-  padding: "12px",
-  border: `1px solid ${colors.border}`,
-  borderRadius: "14px",
-  background: "#fffdf9",
-};
-
-const useBtn = {
+const addressTitle = {
   marginTop: "8px",
-  padding: "8px 14px",
+  color: colors.text,
+  fontSize: "1.45rem",
+};
+
+const addressCard = {
+  padding: "14px",
+  borderRadius: "18px",
+  background: colors.card,
+  border: `1px solid ${colors.border}`,
+  display: "grid",
+  gap: "10px",
+};
+
+const addressText = {
+  color: colors.muted,
+  marginTop: "4px",
+};
+
+const useButton = {
   background: colors.primary,
   color: "white",
   border: "none",
-  borderRadius: "999px",
-  fontWeight: "700",
+  borderRadius: "14px",
+  fontWeight: 800,
+  justifySelf: "start",
+  padding: "10px 14px",
+  minHeight: "auto",
 };
 
 export default Toolbar;

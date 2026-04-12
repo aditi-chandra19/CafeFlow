@@ -4,85 +4,40 @@ import Toolbar from "../components/Toolbar";
 import { colors } from "../theme";
 
 function OrderSuccess() {
-
   const navigate = useNavigate();
-  const [orders, setOrders] = useState([]);
+  const [batch, setBatch] = useState(null);
 
   useEffect(() => {
-  console.log("SUCCESS PAGE");
-
-  const timer = setTimeout(() => {
-    console.log("GOING TO DELIVERY");
-    navigate("/tracking");
-  }, 3000);
-
-  return () => clearTimeout(timer);
-}, [navigate]);
+    const savedBatch = JSON.parse(localStorage.getItem("currentOrderBatch") || "null");
+    setBatch(savedBatch);
+    const timer = setTimeout(() => navigate("/tracking"), 2500);
+    return () => clearTimeout(timer);
+  }, [navigate]);
 
   return (
     <>
       <Toolbar />
+      <div className="page-shell" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div className="glass-panel" style={card}>
+          <div style={icon}>Paid</div>
+          <h1 style={{ color: colors.text, fontSize: "3rem" }}>Order placed successfully</h1>
+          <p style={{ color: colors.muted, marginTop: "10px" }}>Preparing your food and assigning riders now. Redirecting to live tracking.</p>
 
-      <div style={page}>
-
-        <div style={card}>
-
-          {/* 🎉 SUCCESS ICON */}
-          <div style={icon}>✅</div>
-
-          <h1 style={{ color: colors.text }}>
-            Order Placed Successfully!
-          </h1>
-
-          <p style={{ color: "#555", marginTop: "10px" }}>
-            Your order is being prepared 🍽️
-          </p>
-
-          {/* OPTIONAL ORDER PREVIEW */}
-          {orders.map((order, index) => (
-            <div key={index} style={miniCard}>
-              <h3 style={{ color: colors.primary }}>
-                {order.restaurantName}
-              </h3>
-              <p>₹ {order.totalAmount}</p>
+          {batch && (
+            <div style={{ marginTop: "20px", display: "grid", gap: "10px" }}>
+              <div style={miniCard}><strong>Total paid</strong><span>Rs {batch.pricing.grandTotal}</span></div>
+              <div style={miniCard}><strong>Delivery partners</strong><span>{batch.orders.length}</span></div>
+              <div style={miniCard}><strong>ETA</strong><span>{batch.estimatedMinutes} mins</span></div>
             </div>
-          ))}
-
+          )}
         </div>
-
       </div>
     </>
   );
 }
 
-/* STYLES */
-
-const page = {
-  minHeight: "100vh",
-  background: "#FAF7F2",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center"
-};
-
-const card = {
-  background: "#EADBC8",
-  padding: "40px",
-  borderRadius: "20px",
-  textAlign: "center",
-  width: "350px"
-};
-
-const icon = {
-  fontSize: "50px",
-  marginBottom: "10px"
-};
-
-const miniCard = {
-  marginTop: "15px",
-  padding: "10px",
-  background: "#FAF7F2",
-  borderRadius: "10px"
-};
+const card = { width: "min(540px, 100%)", borderRadius: "30px", padding: "32px", textAlign: "center", background: "rgba(255,255,255,0.92)" };
+const icon = { display: "inline-flex", alignItems: "center", justifyContent: "center", width: "88px", height: "88px", borderRadius: "50%", background: "rgba(22,163,74,0.1)", color: colors.success, fontWeight: 700, marginBottom: "14px" };
+const miniCard = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", borderRadius: "18px", background: colors.card, border: `1px solid ${colors.border}` };
 
 export default OrderSuccess;

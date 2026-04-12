@@ -1,93 +1,42 @@
 import { useNavigate } from "react-router-dom";
+import Toolbar from "../components/Toolbar";
+import { colors } from "../theme";
 
 function Bookings() {
   const navigate = useNavigate();
-
   const bookings = [
-    {
-      id: 1,
-      restaurant: "Cafe Mocha",
-      date: "22 March 2026",
-      time: "7:30 PM",
-      guests: 2,
-      status: "Confirmed",
-    },
-    {
-      id: 2,
-      restaurant: "Green Bowl",
-      date: "25 March 2026",
-      time: "1:00 PM",
-      guests: 4,
-      status: "Pending",
-    },
+    { id: 1, restaurant: "Royal Tandoor House", date: "22 April 2026", time: "7:30 PM", guests: 2, status: "Confirmed" },
+    { id: 2, restaurant: "Coastal Thali Co.", date: "25 April 2026", time: "1:00 PM", guests: 4, status: "Pending" },
   ];
 
   return (
-    <div style={container}>
-      <div style={card}>
-        
-        <button style={backBtn} onClick={() => navigate(-1)}>
-          ← Back
-        </button>
-
-        <h2 style={heading}>Your Bookings</h2>
-
-        {bookings.map((item) => (
-          <div key={item.id} style={bookingCard}>
-            <h4>{item.restaurant}</h4>
-            <p>{item.date} • {item.time}</p>
-            <p>Guests: {item.guests}</p>
-            <span style={status}>{item.status}</span>
+    <>
+      <Toolbar />
+      <div className="page-shell">
+        <div className="glass-panel" style={card}>
+          <button className="luxury-button" style={backBtn} onClick={() => navigate(-1)}>Back</button>
+          <h1 style={{ fontSize: "3rem", color: colors.text, marginTop: "12px" }}>Your bookings</h1>
+          <div style={{ marginTop: "20px", display: "grid", gap: "14px" }}>
+            {bookings.map((item) => (
+              <div key={item.id} style={bookingCard}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "start" }}>
+                  <div>
+                    <h3 style={{ fontSize: "2rem", color: colors.text }}>{item.restaurant}</h3>
+                    <p style={{ color: colors.muted }}>{item.date} � {item.time}</p>
+                    <p style={{ color: colors.text }}>Guests: {item.guests}</p>
+                  </div>
+                  <span style={statusPill}>{item.status}</span>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-
+        </div>
       </div>
-    </div>
+    </>
   );
 }
-
-/* 🎨 STYLES */
-
-const container = {
-  minHeight: "100vh",
-  background: "#FAF7F2",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-};
-
-const card = {
-  background: "var(--card)",
-  color: "var(--text)",
-  padding: "30px",
-  borderRadius: "20px",
-  width: "400px",
-};
-
-const heading = {
-  marginBottom: "20px",
-};
-
-const bookingCard = {
-  background: "#FAF7F2",
-  padding: "12px",
-  borderRadius: "10px",
-  marginBottom: "10px",
-};
-
-const status = {
-  color: "#588157",
-  fontWeight: "bold",
-};
-
-const backBtn = {
-  background: "#588157",
-  color: "white",
-  border: "none",
-  padding: "8px 12px",
-  borderRadius: "8px",
-  cursor: "pointer",
-  marginBottom: "15px",
-};
-
+const card = { maxWidth: "760px", margin: "0 auto", borderRadius: "30px", padding: "24px" };
+const bookingCard = { padding: "18px", borderRadius: "20px", background: colors.card, border: `1px solid ${colors.border}` };
+const statusPill = { padding: "8px 12px", borderRadius: "999px", background: "rgba(15,118,110,0.12)", color: colors.secondary, fontWeight: 700 };
+const backBtn = { background: colors.primary, color: "white" };
 export default Bookings;

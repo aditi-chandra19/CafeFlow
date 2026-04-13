@@ -1,292 +1,210 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Toolbar from "../components/Toolbar";
-import {
-  BackButton,
-  PageContainer,
-  PageHeading,
-  SplitLayout,
-  SurfacePanel,
-} from "../components/ui/AppShell";
 import { getCurrentOrderBatch } from "../lib/storage";
-import { colors } from "../theme";
+import CafeIcon from "../components/CafeIcon";
+
+function formatOrderCode(order) {
+  const base = String(order.orderId || order._id || Date.now()).replace(/[^0-9a-z]/gi, "").toUpperCase();
+  return `CF-${base.slice(-8)}`;
+}
 
 function LiveTracking() {
   const navigate = useNavigate();
   const batch = getCurrentOrderBatch();
 
-  const mapSrc = useMemo(() => {
-    const lat = batch?.delivery?.lat || 12.9716;
-    const lng = batch?.delivery?.lng || 77.5946;
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.03}%2C${lat - 0.02}%2C${lng + 0.03}%2C${lat + 0.02}&layer=mapnik&marker=${lat}%2C${lng}`;
-  }, [batch]);
+  const orders = batch?.orders?.length ? batch.orders : [
+    {
+      orderId: "fallback-1",
+      restaurantName: "Spice Junction",
+      orderMode: "Delivery",
+      deliveryPartner: { name: "Rajesh Kumar", phone: "+91 99999 11111", vehicle: "Bike", rating: 4.8 },
+    },
+  ];
 
-  if (!batch) {
-    return (
-      <>
-        <Toolbar />
-        <PageContainer maxWidth="760px">
-          <SurfacePanel style={{ borderRadius: "32px", padding: "30px" }}>
-            <PageHeading title="No active order" subtitle="Place an order first to unlock the live delivery view." />
-            <button className="luxury-button" style={{ ...primaryButton, marginTop: "18px" }} onClick={() => navigate("/menu")}>
-              Back to menu
-            </button>
-          </SurfacePanel>
-        </PageContainer>
-      </>
-    );
-  }
+  const primaryOrder = orders[0];
+  const isDeliveryMode = (primaryOrder?.orderMode || "Delivery") === "Delivery";
+
+  const mapPoints = useMemo(
+    () => [
+      { label: "You", top: "58%", left: "9%", accent: "green" },
+      { label: "Partner 2", top: "25%", left: "46%", accent: "orange" },
+      { label: "Partner 1", top: "8%", left: "68%", accent: "orange" },
+    ],
+    []
+  );
+
+  const nonDeliveryTitle = primaryOrder?.orderMode === "Dine-in"
+    ? "Table order in progress"
+    : primaryOrder?.orderMode === "Pre-order"
+      ? `Scheduled for ${primaryOrder?.preOrderTime || "19:30"}`
+      : "Pickup order in progress";
 
   return (
     <>
       <Toolbar />
-      <PageContainer maxWidth="1360px">
-        <BackButton onClick={() => navigate("/menu")} style={{ marginBottom: "18px" }}>
-          Back to menu
-        </BackButton>
-
-        <SplitLayout columns="minmax(0, 1.25fr) minmax(360px, 0.75fr)">
-          <SurfacePanel style={mapPanel}>
-            <PageHeading
-              title="Live order tracking"
-              subtitle="Monitor rider progress and destination status through a cleaner delivery dashboard."
-            />
-
-            <div style={mapWrap}>
-              <iframe title="Live delivery map" src={mapSrc} style={mapFrame} />
-            </div>
-
-            <div style={statusStrip}>
-              <div style={statusCard}>
-                <span style={statusLabel}>Destination</span>
-                <strong style={statusValue}>{batch.delivery?.label || "Saved address"}</strong>
-              </div>
-              <div style={statusCard}>
-                <span style={statusLabel}>Riders active</span>
-                <strong style={statusValue}>{batch.orders.length}</strong>
-              </div>
-              <div style={statusCard}>
-                <span style={statusLabel}>Tracking mode</span>
-                <strong style={statusValue}>Live</strong>
-              </div>
-            </div>
-          </SurfacePanel>
-
-          <SurfacePanel style={sidePanel}>
-            <div style={panelHeader}>
-              <h2 style={panelTitle}>Delivery activity</h2>
-              <p style={panelCopy}>
-                Multi-restaurant orders keep separate dispatch cards so the live view stays clear.
-              </p>
-            </div>
-
-            <div style={deliveryStack}>
-              {batch.orders.map((order, index) => (
-                <article key={order.orderId} style={trackingCard}>
-                  <div style={trackingHeader}>
-                    <div>
-                      <p className="muted-kicker">Restaurant</p>
-                      <strong style={trackingTitle}>{order.restaurantName}</strong>
-                    </div>
-                    <span style={statusPill}>On the way</span>
-                  </div>
-
-                  <div style={detailGrid}>
-                    <div style={detailBlock}>
-                      <span style={detailLabel}>Partner</span>
-                      <strong style={detailValue}>{order.deliveryPartner.name}</strong>
-                    </div>
-                    <div style={detailBlock}>
-                      <span style={detailLabel}>Vehicle</span>
-                      <strong style={detailValue}>{order.deliveryPartner.vehicle}</strong>
-                    </div>
-                    <div style={detailBlock}>
-                      <span style={detailLabel}>Phone</span>
-                      <strong style={detailValue}>{order.deliveryPartner.phone}</strong>
-                    </div>
-                  </div>
-
-                  <div style={progressBlock}>
-                    <div style={progressMeta}>
-                      <span style={detailLabel}>Route progress</span>
-                      <strong style={detailValue}>{index === 0 ? "72%" : "58%"}</strong>
-                    </div>
-                    <div style={progressBar}>
-                      <div style={{ ...progressFill, width: index === 0 ? "72%" : "58%" }} />
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            <button className="luxury-button" style={primaryButton} onClick={() => navigate("/menu")}>
-              Continue browsing
+      <div className="app-page-shell">
+        <div className="app-content-shell">
+          <div className="track-title-row">
+            <button type="button" className="track-back-link" onClick={() => navigate(-1)}>
+              <CafeIcon kind="arrowLeft" /> Back
             </button>
-          </SurfacePanel>
-        </SplitLayout>
-      </PageContainer>
+            <h1>Track Order</h1>
+          </div>
+
+          {isDeliveryMode ? (
+            <section className="track-layout">
+              <div className="track-map-card">
+                <div className="track-map-stage">
+                  {mapPoints.map((point) => (
+                    <div key={point.label} className={`track-map-pin is-${point.accent}`} style={{ top: point.top, left: point.left }}>
+                      <span><CafeIcon kind="track" /></span>
+                      <small>{point.label}</small>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="track-partners">
+                  <h2>Delivery Partners</h2>
+                  {orders.map((order) => (
+                    <article key={order.orderId} className="track-partners__card">
+                      <div className="track-partners__avatar"><CafeIcon kind="profile" /></div>
+                      <div>
+                        <strong>{order.deliveryPartner?.name || "Delivery Partner"}</strong>
+                        <p>? {order.deliveryPartner?.rating || 4.8} • {order.deliveryPartner?.vehicle || "Bike"}</p>
+                      </div>
+                      <button type="button"><CafeIcon kind="chat" /></button>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              <div className="track-side">
+                <section className="track-eta-card">
+                  <p><CafeIcon kind="clock" /> Estimated Delivery</p>
+                  <strong>{primaryOrder?.estimatedMinutes || 23} min</strong>
+                  <span>Your order will arrive soon</span>
+                  <div className="track-eta-card__bar"><div /></div>
+                </section>
+
+                <section className="track-status-card">
+                  <h2>Order Status</h2>
+                  <div className="track-timeline">
+                    <div className="track-timeline__item is-active">
+                      <span className="track-timeline__dot"><CafeIcon kind="rewards" /></span>
+                      <div>
+                        <strong>Order Confirmed</strong>
+                        <p>Your order has been confirmed</p>
+                        <small>In Progress</small>
+                      </div>
+                    </div>
+                    <div className="track-timeline__item">
+                      <span className="track-timeline__dot"><CafeIcon kind="browse" /></span>
+                      <div>
+                        <strong>Preparing</strong>
+                        <p>Restaurant is preparing your food</p>
+                      </div>
+                    </div>
+                    <div className="track-timeline__item">
+                      <span className="track-timeline__dot"><CafeIcon kind="track" /></span>
+                      <div>
+                        <strong>Out for Delivery</strong>
+                        <p>Delivery partner is on the way</p>
+                      </div>
+                    </div>
+                    <div className="track-timeline__item">
+                      <span className="track-timeline__dot"><CafeIcon kind="gift" /></span>
+                      <div>
+                        <strong>Delivered</strong>
+                        <p>Order delivered successfully</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="track-items-card">
+                  <h2>Order Items</h2>
+                  <div className="track-items-card__list">
+                    {orders.map((order) => (
+                      <div key={order.orderId} className="track-items-card__item">
+                        <strong>{order.restaurantName}</strong>
+                        <span>{order.deliveryPartner?.vehicle || "Bike"}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </section>
+          ) : (
+            <section className="track-layout">
+              <div className="track-map-card" style={{ display: "grid", gap: "18px", padding: "26px" }}>
+                <div className="profile-card" style={{ margin: 0 }}>
+                  <p className="muted-kicker">Order Number</p>
+                  <h2 style={{ fontSize: "2.4rem", marginTop: "8px" }}>{formatOrderCode(primaryOrder)}</h2>
+                  <p style={{ marginTop: "10px", color: "var(--app-muted, #6b7280)" }}>{primaryOrder?.restaurantName}</p>
+                </div>
+
+                <div className="profile-card" style={{ margin: 0 }}>
+                  <p className="muted-kicker">Order Mode</p>
+                  <h2 style={{ fontSize: "2.1rem", marginTop: "8px" }}>{primaryOrder?.orderMode}</h2>
+                  <p style={{ marginTop: "10px", color: "var(--app-muted, #6b7280)" }}>{nonDeliveryTitle}</p>
+                </div>
+              </div>
+
+              <div className="track-side">
+                <section className="track-eta-card">
+                  <p><CafeIcon kind="clock" /> {primaryOrder?.orderMode === "Pre-order" ? "Scheduled Time" : "Ready In"}</p>
+                  <strong>{primaryOrder?.orderMode === "Pre-order" ? (primaryOrder?.preOrderTime || "19:30") : `${primaryOrder?.estimatedMinutes || 20} min`}</strong>
+                  <span>{primaryOrder?.orderMode === "Dine-in" ? "Your table order is being prepared" : "We are preparing your order now"}</span>
+                  <div className="track-eta-card__bar"><div /></div>
+                </section>
+
+                <section className="track-status-card">
+                  <h2>Order Status</h2>
+                  <div className="track-timeline">
+                    <div className="track-timeline__item is-active">
+                      <span className="track-timeline__dot"><CafeIcon kind="rewards" /></span>
+                      <div>
+                        <strong>Order Confirmed</strong>
+                        <p>Your order number has been generated</p>
+                        <small>{formatOrderCode(primaryOrder)}</small>
+                      </div>
+                    </div>
+                    <div className="track-timeline__item is-active">
+                      <span className="track-timeline__dot"><CafeIcon kind="browse" /></span>
+                      <div>
+                        <strong>Preparing</strong>
+                        <p>Kitchen has started preparing your items</p>
+                      </div>
+                    </div>
+                    <div className="track-timeline__item">
+                      <span className="track-timeline__dot"><CafeIcon kind="clock" /></span>
+                      <div>
+                        <strong>{primaryOrder?.orderMode === "Dine-in" ? "Serving Soon" : primaryOrder?.orderMode === "Pre-order" ? "Ready At Time Slot" : "Ready for Pickup"}</strong>
+                        <p>{primaryOrder?.orderMode === "Pre-order" ? `Be ready by ${primaryOrder?.preOrderTime || "19:30"}` : "We will notify you when the order is ready"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="track-items-card">
+                  <h2>Order Items</h2>
+                  <div className="track-items-card__list">
+                    {orders.map((order) => (
+                      <div key={order.orderId} className="track-items-card__item">
+                        <strong>{order.restaurantName}</strong>
+                        <span>{order.orderMode}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
     </>
   );
 }
-
-const mapPanel = {
-  borderRadius: "32px",
-  padding: "24px",
-};
-
-const sidePanel = {
-  borderRadius: "32px",
-  padding: "24px",
-  display: "grid",
-  gap: "18px",
-};
-
-const mapWrap = {
-  marginTop: "22px",
-  borderRadius: "28px",
-  overflow: "hidden",
-  border: `1px solid ${colors.border}`,
-  boxShadow: "0 18px 40px rgba(17, 24, 39, 0.08)",
-};
-
-const mapFrame = {
-  width: "100%",
-  height: "480px",
-  border: "0",
-};
-
-const statusStrip = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-  gap: "14px",
-  marginTop: "18px",
-};
-
-const statusCard = {
-  padding: "18px",
-  borderRadius: "22px",
-  background: colors.card,
-  border: `1px solid ${colors.border}`,
-  display: "grid",
-  gap: "8px",
-};
-
-const statusLabel = {
-  color: colors.muted,
-  fontSize: "11px",
-  textTransform: "uppercase",
-  letterSpacing: "0.16em",
-  fontWeight: 800,
-};
-
-const statusValue = {
-  color: colors.text,
-  fontSize: "1rem",
-};
-
-const panelHeader = {
-  display: "grid",
-  gap: "8px",
-};
-
-const panelTitle = {
-  fontSize: "2rem",
-  color: colors.text,
-};
-
-const panelCopy = {
-  color: colors.muted,
-};
-
-const deliveryStack = {
-  display: "grid",
-  gap: "12px",
-};
-
-const trackingCard = {
-  padding: "20px",
-  borderRadius: "24px",
-  background: "white",
-  border: `1px solid ${colors.border}`,
-  boxShadow: "0 16px 34px rgba(17, 24, 39, 0.06)",
-  display: "grid",
-  gap: "16px",
-};
-
-const trackingHeader = {
-  display: "flex",
-  justifyContent: "space-between",
-  gap: "12px",
-  alignItems: "start",
-};
-
-const trackingTitle = {
-  color: colors.text,
-  marginTop: "8px",
-  fontSize: "1.15rem",
-};
-
-const statusPill = {
-  padding: "8px 12px",
-  borderRadius: "999px",
-  background: "rgba(47,106,96,0.1)",
-  color: colors.secondary,
-  fontWeight: 700,
-};
-
-const detailGrid = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-  gap: "12px",
-};
-
-const detailBlock = {
-  display: "grid",
-  gap: "5px",
-};
-
-const detailLabel = {
-  color: colors.muted,
-  fontSize: "11px",
-  textTransform: "uppercase",
-  letterSpacing: "0.16em",
-  fontWeight: 800,
-};
-
-const detailValue = {
-  color: colors.text,
-  fontSize: "0.95rem",
-};
-
-const progressBlock = {
-  display: "grid",
-  gap: "10px",
-};
-
-const progressMeta = {
-  display: "flex",
-  justifyContent: "space-between",
-  gap: "10px",
-  alignItems: "center",
-};
-
-const progressBar = {
-  height: "10px",
-  background: "rgba(191,78,59,0.1)",
-  borderRadius: "999px",
-  overflow: "hidden",
-};
-
-const progressFill = {
-  height: "100%",
-  borderRadius: "999px",
-  background: "linear-gradient(90deg, #bf4e3b 0%, #2f6a60 100%)",
-};
-
-const primaryButton = {
-  background: "linear-gradient(135deg, #bf4e3b, #c58a2c)",
-  color: "white",
-  width: "100%",
-};
 
 export default LiveTracking;

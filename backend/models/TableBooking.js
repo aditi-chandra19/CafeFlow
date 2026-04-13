@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const tableBookingSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  },
   name: String,
   phone: String,
   guests: Number,

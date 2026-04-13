@@ -12,6 +12,8 @@ export function groupOrdersByRestaurant(cart) {
         accumulator[item.restaurantId] = {
           restaurantId: item.restaurantId,
           restaurantName: item.restaurantName,
+          orderMode: item.orderMode || "Delivery",
+          preOrderTime: item.preOrderTime || "",
           items: [],
         };
       }
@@ -32,17 +34,41 @@ export function createOrderBatch({
   const groupedOrders = groupOrdersByRestaurant(cart);
   const createdAt = new Date();
 
-  const orders = groupedOrders.map((order, index) => ({
-    ...order,
-    orderId: `${createdAt.getTime()}-${index}`,
-    totalAmount: order.items.reduce(
+  const subtotalBase = pricing?.subtotal || groupedOrders.reduce(
+    (sum, order) => sum + order.items.reduce((itemSum, item) => itemSum + item.price * item.qty, 0),
+    0
+  );
+
+  const orders = groupedOrders.map((order, index) => {
+    const subtotal = order.items.reduce(
       (sum, item) => sum + item.price * item.qty,
       0
-    ),
-    deliveryPartner: RIDERS_POOL[index % RIDERS_POOL.length],
-    date: createdAt.toLocaleString(),
-    status: "Preparing",
-  }));
+    );
+    const ratio = subtotalBase > 0 ? subtotal / subtotalBase : 0;
+    const couponDiscountShare = Math.round((pricing?.couponDiscount || 0) * ratio);
+    const multiRestaurantDiscountShare = Math.round((pricing?.multiRestaurantDiscount || 0) * ratio);
+    const deliveryFeeShare = Math.round((pricing?.deliveryFee || 0) * ratio);
+    const platformFeeShare = Math.round((pricing?.platformFee || 0) * ratio);
+    const finalTotalAmount = Math.max(
+      0,
+      subtotal + deliveryFeeShare + platformFeeShare - couponDiscountShare - multiRestaurantDiscountShare
+    );
+
+    return {
+      ...order,
+      orderId: `${createdAt.getTime()}-${index}`,
+      subtotal,
+      couponDiscountShare,
+      multiRestaurantDiscountShare,
+      deliveryFeeShare,
+      platformFeeShare,
+      totalAmount: finalTotalAmount,
+      finalTotalAmount,
+      deliveryPartner: order.orderMode === "Delivery" ? RIDERS_POOL[index % RIDERS_POOL.length] : null,
+      date: createdAt.toLocaleString(),
+      status: "Preparing",
+    };
+  });
 
   return {
     id: `${createdAt.getTime()}`,

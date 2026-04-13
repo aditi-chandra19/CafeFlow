@@ -3,35 +3,29 @@ import { useNavigate } from "react-router-dom";
 import { colors } from "../theme";
 import Toolbar from "../components/Toolbar";
 import { localRestaurants } from "../data/mockData";
+import { apiGet } from "../lib/api";
 
 function Menu() {
   const [search, setSearch] = useState("");
-  const [restaurants, setRestaurants] = useState([]);
+  const [restaurants, setRestaurants] = useState(localRestaurants);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:5000/restaurants")
-      .then((res) => res.json())
-      .then((data) => setRestaurants(Array.isArray(data) ? data : []))
-      .catch(() => setRestaurants([]));
+    apiGet("/restaurants")
+      .then((data) => setRestaurants(Array.isArray(data) && data.length ? data : localRestaurants))
+      .catch(() => setRestaurants(localRestaurants));
   }, []);
 
-  const allRestaurants = useMemo(() => {
-    const merged = [...localRestaurants];
-    restaurants.forEach((restaurant) => {
-      if (!merged.find((item) => item._id === restaurant._id)) merged.push(restaurant);
-    });
-    return merged;
-  }, [restaurants]);
-
-  const filteredRestaurants = allRestaurants.filter((restaurant) => {
+  const filteredRestaurants = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return true;
-    return (
-      restaurant.name.toLowerCase().includes(query) ||
-      (restaurant.cuisine || []).join(" ").toLowerCase().includes(query)
-    );
-  });
+    return restaurants.filter((restaurant) => {
+      if (!query) return true;
+      return (
+        restaurant.name.toLowerCase().includes(query) ||
+        (restaurant.cuisine || []).join(" ").toLowerCase().includes(query)
+      );
+    });
+  }, [restaurants, search]);
 
   return (
     <>
@@ -61,7 +55,7 @@ function Menu() {
               <div style={heroSide}>
                 <div style={heroStatCard}>
                   <span style={statLabel}>Active venues</span>
-                  <strong style={statValue}>{allRestaurants.length}</strong>
+                  <strong style={statValue}>{restaurants.length}</strong>
                 </div>
                 <div style={heroStatCard}>
                   <span style={statLabel}>Core flow</span>

@@ -5,7 +5,11 @@ const STORAGE_KEYS = {
   currentOrderBatch: "currentOrderBatch",
   deliveryDetails: "deliveryDetails",
   favorites: "favorites",
+  language: "language",
+  notifications: "notifications",
   orderHistory: "orderHistory",
+  preferences: "preferences",
+  theme: "theme",
   user: "user",
 };
 
@@ -88,4 +92,56 @@ export function getUserProfile() {
 
 export function setUserProfile(profile) {
   writeJson(STORAGE_KEYS.user, profile);
+}
+
+export function getThemePreference() {
+  return localStorage.getItem(STORAGE_KEYS.theme) || "light";
+}
+
+export function setThemePreference(theme) {
+  localStorage.setItem(STORAGE_KEYS.theme, theme);
+}
+
+export function getLanguagePreference() {
+  return localStorage.getItem(STORAGE_KEYS.language) || "English";
+}
+
+export function setLanguagePreference(language) {
+  localStorage.setItem(STORAGE_KEYS.language, language);
+}
+
+export function getNotificationSettings() {
+  return readJson(STORAGE_KEYS.notifications, {
+    orderUpdates: true,
+    dealsOffers: true,
+    recommendations: true,
+    loyaltyRewards: true,
+    pushNotifications: true,
+    sms: true,
+    email: false,
+  });
+}
+
+export function setNotificationSettings(settings) {
+  writeJson(STORAGE_KEYS.notifications, settings);
+}
+
+export function getAppPreferences() {
+  return readJson(STORAGE_KEYS.preferences, {
+    language: "English",
+    autoplayVideos: true,
+    hapticFeedback: true,
+    reducedMotion: false,
+    dataSaver: false,
+    cacheSize: "128.5 MB",
+  });
+}
+
+export function setAppPreferences(preferences) {
+  writeJson(STORAGE_KEYS.preferences, preferences);
+}
+
+export function clearSession() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
 }

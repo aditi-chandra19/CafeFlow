@@ -18,6 +18,30 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["admin", "customer"],
     default: "customer"
+  },
+  phone: {
+    type: String,
+    default: ""
+  },
+  address: {
+    type: String,
+    default: ""
+  },
+  city: {
+    type: String,
+    default: ""
+  },
+  pincode: {
+    type: String,
+    default: ""
+  },
+  referralCode: {
+    type: String,
+    default: function generateReferralCode() {
+      const base = (this.name || "CAFE").replace(/[^a-z0-9]/gi, "").toUpperCase().slice(0, 4) || "CAFE";
+      const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+      return `${base}${suffix}`;
+    }
   }
 }, { timestamps: true });
 

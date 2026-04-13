@@ -30,7 +30,7 @@ function OrderSummary() {
               <div key={order.orderId} style={orderCard}>
                 <h3 style={{ color: colors.primaryDark, fontSize: "2rem" }}>{order.restaurantName}</h3>
                 {order.items.map((item) => <p key={`${order.orderId}-${item._id}`} style={{ color: colors.muted }}>{item.name} x {item.qty}</p>)}
-                <p style={{ fontWeight: 700, marginTop: "8px" }}>{formatCurrency(order.totalAmount)}</p>
+                <p style={{ fontWeight: 700, marginTop: "8px" }}>{formatCurrency(order.finalTotalAmount || order.totalAmount)}</p>
               </div>
             )) || <p style={{ color: colors.muted }}>No active summary found.</p>}
           </div>

@@ -13,6 +13,7 @@ import {
   setCurrentOrderBatch,
 } from "../lib/storage";
 import { formatCurrency } from "../lib/format";
+import { apiPost } from "../lib/api";
 import {
   BackButton,
   PageContainer,
@@ -31,6 +32,7 @@ function Payment() {
   const [cardName, setCardName] = useState("");
   const [upiId, setUpiId] = useState("");
   const [bank, setBank] = useState("HDFC Bank");
+  const [submitting, setSubmitting] = useState(false);
 
   const cart = Object.values(groupCartItems(getCart()));
   const delivery = getDeliveryDetails();
@@ -41,7 +43,7 @@ function Payment() {
   );
   const groupedOrders = useMemo(() => groupOrdersByRestaurant(cart), [cart]);
 
-  const validateAndPay = () => {
+  const validateAndPay = async () => {
     if (!cart.length) {
       alert("Cart is empty");
       return;
@@ -63,18 +65,33 @@ function Payment() {
       return;
     }
 
-    const batch = createOrderBatch({
-      bank,
-      cart,
-      delivery,
-      paymentMethod,
-      pricing,
-    });
+    setSubmitting(true);
 
-    appendOrderHistory(batch.orders);
-    setCurrentOrderBatch(batch);
-    clearCart();
-    navigate("/success");
+    try {
+      const batch = createOrderBatch({
+        bank,
+        cart,
+        delivery,
+        paymentMethod,
+        pricing,
+      });
+
+      const response = await apiPost("/place-order", { batch });
+      const savedOrders = Array.isArray(response.orders) && response.orders.length ? response.orders : batch.orders;
+      const persistedBatch = {
+        ...batch,
+        orders: savedOrders,
+      };
+
+      appendOrderHistory(savedOrders);
+      setCurrentOrderBatch(persistedBatch);
+      clearCart();
+      navigate("/success");
+    } catch (error) {
+      alert(error.message || "Payment failed");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -130,7 +147,9 @@ function Payment() {
               </div>
             )}
 
-            <button className="luxury-button" style={{ ...primaryBtn, width: "100%", marginTop: "18px" }} onClick={validateAndPay}>Pay Rs {pricing.grandTotal}</button>
+            <button className="luxury-button" style={{ ...primaryBtn, width: "100%", marginTop: "18px" }} onClick={validateAndPay} disabled={submitting}>
+              {submitting ? "Processing..." : `Pay ${formatCurrency(pricing.grandTotal)}`}
+            </button>
           </SurfacePanel>
 
           <SurfacePanel>
@@ -194,6 +213,5 @@ const selectedMethod = { background: colors.primary, color: "white" };
 const formStack = { display: "grid", gap: "12px", marginTop: "18px" };
 const summaryCard = { padding: "16px", borderRadius: "18px", background: colors.card, border: `1px solid ${colors.border}` };
 const primaryBtn = { background: colors.primary, color: "white" };
-const secondaryBtn = { background: colors.card, color: colors.text };
 
 export default Payment;

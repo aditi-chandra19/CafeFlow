@@ -1,32 +1,31 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { colors } from "../theme";
+import { apiPost } from "../lib/api";
+import { setUserProfile } from "../lib/storage";
+import { useLanguage } from "../components/LanguageProvider";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
 
   const redirectTo = location.state?.redirectTo || "/menu";
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    const res = await fetch("http://localhost:5000/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
+    try {
+      const data = await apiPost("/login", { email, password });
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
+      if (data.user) {
+        setUserProfile(data.user);
+      }
       navigate(data.role === "admin" ? "/dashboard" : redirectTo);
-    } else {
-      alert(data.message || "Login failed");
+    } catch (error) {
+      alert(error.message || "Login failed");
     }
   };
 
@@ -34,8 +33,8 @@ function Login() {
     <div className="page-shell">
       <div style={shell}>
         <section style={visualPanel}>
-          <div style={visualBadge}>Welcome back</div>
-          <h1 style={heroTitle}>Sign in and continue the experience.</h1>
+          <div style={visualBadge}>{t("Welcome back")}</div>
+          <h1 style={heroTitle}>{t("Sign in and continue the experience.")}</h1>
           <p style={heroCopy}>
             Access restaurant discovery, reservations, saved delivery details, payment options,
             and live tracking through one modern account flow.
@@ -43,37 +42,37 @@ function Login() {
 
           <div style={previewGrid}>
             <div style={previewCard}>
-              <span style={previewLabel}>Public entry</span>
-              <strong style={previewValue}>Explore page before auth</strong>
+              <span style={previewLabel}>{t("Public entry")}</span>
+              <strong style={previewValue}>{t("Explore page before auth")}</strong>
             </div>
             <div style={previewCard}>
-              <span style={previewLabel}>After login</span>
-              <strong style={previewValue}>Marketplace, menu, cart, booking, tracking</strong>
+              <span style={previewLabel}>{t("After login")}</span>
+              <strong style={previewValue}>{t("Marketplace, menu, cart, booking, tracking")}</strong>
             </div>
           </div>
         </section>
 
         <form onSubmit={handleLogin} className="glass-panel" style={formPanel}>
           <div>
-            <p className="muted-kicker">Account access</p>
-            <h2 style={formTitle}>Sign in to CafeFlow</h2>
-            <p style={formCopy}>Use your email and password to continue.</p>
+            <p className="muted-kicker">{t("Account access")}</p>
+            <h2 style={formTitle}>{t("Sign in to CafeFlow")}</h2>
+            <p style={formCopy}>{t("Use your email and password to continue.")}</p>
           </div>
 
           <label style={field}>
-            <span style={label}>Email</span>
-            <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} className="luxury-input" required />
+            <span style={label}>{t("Email")}</span>
+            <input type="email" placeholder={t("Enter your email")} value={email} onChange={(e) => setEmail(e.target.value)} className="luxury-input" required />
           </label>
 
           <label style={field}>
-            <span style={label}>Password</span>
-            <input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} className="luxury-input" required />
+            <span style={label}>{t("Password")}</span>
+            <input type="password" placeholder={t("Enter your password")} value={password} onChange={(e) => setPassword(e.target.value)} className="luxury-input" required />
           </label>
 
-          <button type="submit" className="luxury-button" style={primaryButton}>Sign in</button>
+          <button type="submit" className="luxury-button" style={primaryButton}>{t("Sign in")}</button>
 
           <p style={footerText}>
-            Need an account? <button type="button" onClick={() => navigate("/register", { state: { redirectTo } })} style={linkButton}>Register</button>
+            {t("Need an account?")} <button type="button" onClick={() => navigate("/register", { state: { redirectTo } })} style={linkButton}>{t("Register")}</button>
           </p>
         </form>
       </div>

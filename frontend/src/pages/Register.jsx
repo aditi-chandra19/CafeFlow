@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { colors } from "../theme";
+import { apiPost } from "../lib/api";
+import { useLanguage } from "../components/LanguageProvider";
 
 function Register() {
   const [name, setName] = useState("");
@@ -8,24 +10,17 @@ function Register() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
   const redirectTo = location.state?.redirectTo || "/menu";
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
-    const res = await fetch("http://localhost:5000/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
+    try {
+      await apiPost("/register", { name, email, password });
       alert("Registered successfully!");
       navigate("/login", { state: { redirectTo } });
-    } else {
-      alert(data.message || "Registration failed");
+    } catch (error) {
+      alert(error.message || "Registration failed");
     }
   };
 
@@ -33,8 +28,8 @@ function Register() {
     <div className="page-shell">
       <div style={shell}>
         <section style={visualPanel}>
-          <div style={visualBadge}>Create account</div>
-          <h1 style={heroTitle}>Join the app and unlock the full flow.</h1>
+          <div style={visualBadge}>{t("Create account")}</div>
+          <h1 style={heroTitle}>{t("Join the app and unlock the full flow.")}</h1>
           <p style={heroCopy}>
             Save favorites, place orders, reserve tables, store addresses, and track deliveries inside one
             clean account experience.
@@ -42,42 +37,42 @@ function Register() {
 
           <div style={previewGrid}>
             <div style={previewCard}>
-              <span style={previewLabel}>Included</span>
-              <strong style={previewValue}>Restaurant discovery and Indian menu ordering</strong>
+              <span style={previewLabel}>{t("Included")}</span>
+              <strong style={previewValue}>{t("Restaurant discovery and Indian menu ordering")}</strong>
             </div>
             <div style={previewCard}>
-              <span style={previewLabel}>Also included</span>
-              <strong style={previewValue}>Table booking, payments, delivery, live tracking</strong>
+              <span style={previewLabel}>{t("Also included")}</span>
+              <strong style={previewValue}>{t("Table booking, payments, delivery, live tracking")}</strong>
             </div>
           </div>
         </section>
 
         <form onSubmit={handleRegister} className="glass-panel" style={formPanel}>
           <div>
-            <p className="muted-kicker">New account</p>
-            <h2 style={formTitle}>Register for CafeFlow</h2>
-            <p style={formCopy}>Enter your details to continue into the main app.</p>
+            <p className="muted-kicker">{t("New account")}</p>
+            <h2 style={formTitle}>{t("Register for CafeFlow")}</h2>
+            <p style={formCopy}>{t("Enter your details to continue into the main app.")}</p>
           </div>
 
           <label style={field}>
-            <span style={label}>Full name</span>
-            <input type="text" placeholder="Enter your full name" value={name} onChange={(e) => setName(e.target.value)} className="luxury-input" required />
+            <span style={label}>{t("Full name")}</span>
+            <input type="text" placeholder={t("Enter your full name")} value={name} onChange={(e) => setName(e.target.value)} className="luxury-input" required />
           </label>
 
           <label style={field}>
-            <span style={label}>Email</span>
-            <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} className="luxury-input" required />
+            <span style={label}>{t("Email")}</span>
+            <input type="email" placeholder={t("Enter your email")} value={email} onChange={(e) => setEmail(e.target.value)} className="luxury-input" required />
           </label>
 
           <label style={field}>
-            <span style={label}>Password</span>
-            <input type="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} className="luxury-input" required />
+            <span style={label}>{t("Password")}</span>
+            <input type="password" placeholder={t("Create a password")} value={password} onChange={(e) => setPassword(e.target.value)} className="luxury-input" required />
           </label>
 
-          <button type="submit" className="luxury-button" style={primaryButton}>Create account</button>
+          <button type="submit" className="luxury-button" style={primaryButton}>{t("Create account")}</button>
 
           <p style={footerText}>
-            Already registered? <button type="button" onClick={() => navigate("/login", { state: { redirectTo } })} style={linkButton}>Sign in</button>
+            {t("Already registered?")} <button type="button" onClick={() => navigate("/login", { state: { redirectTo } })} style={linkButton}>{t("Sign in")}</button>
           </p>
         </form>
       </div>

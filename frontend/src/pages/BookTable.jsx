@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BackButton, PageContainer, SurfacePanel } from "../components/ui/AppShell";
 import { colors } from "../theme";
+import { apiGet, apiPost } from "../lib/api";
 
 function BookTable() {
   const navigate = useNavigate();
@@ -11,21 +12,28 @@ function BookTable() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
 
+  useEffect(() => {
+    apiGet("/me")
+      .then((user) => {
+        setName(user.name || "");
+        setPhone(user.phone || "");
+      })
+      .catch(() => {});
+  }, []);
+
   const handleBooking = async () => {
     if (!name.trim() || !phone.trim() || !date || !time || guests < 1) {
       alert("Please fill all booking details.");
       return;
     }
 
-    const res = await fetch("http://localhost:5000/book-table", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, phone, guests, date, time }),
-    });
-
-    const data = await res.json();
-    alert(data.message);
-    setTimeout(() => navigate("/menu"), 500);
+    try {
+      const data = await apiPost("/book-table", { name, phone, guests, date, time });
+      alert(data.message || "Table booked successfully");
+      setTimeout(() => navigate("/menu"), 500);
+    } catch (error) {
+      alert(error.message || "Booking failed");
+    }
   };
 
   return (
